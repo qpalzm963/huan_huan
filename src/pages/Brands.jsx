@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { collection, getDocs, deleteDoc, doc, orderBy, query } from 'firebase/firestore'
+import { collection, getDocs, deleteDoc, doc, orderBy, query, getCountFromServer } from 'firebase/firestore'
 import { db } from '../firebase'
 import Card from '../components/Card'
 import EmptyState from '../components/EmptyState'
-import { Plus, Trash2, Star } from 'lucide-react'
+import { Plus, Trash2, Star, ChevronRight } from 'lucide-react'
 
 const CATEGORIES = { food: '食品', snack: '零食', litter: '貓砂', supplies: '用品' }
 const CAT_COLORS = { food: '#4AAFDC', snack: '#F97316', litter: '#34D399', supplies: '#A78BFA' }
@@ -12,18 +12,29 @@ const CAT_COLORS = { food: '#4AAFDC', snack: '#F97316', litter: '#34D399', suppl
 export default function Brands() {
   const navigate = useNavigate()
   const [brands, setBrands] = useState([])
+  const [productCounts, setProductCounts] = useState({})
   const [loading, setLoading] = useState(true)
 
   async function load() {
     const q = query(collection(db, 'brands'), orderBy('category'))
     const snap = await getDocs(q)
-    setBrands(snap.docs.map(d => ({ id: d.id, ...d.data() })))
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    setBrands(list)
+
+    // 讀取各品牌產品數
+    const counts = {}
+    await Promise.all(list.map(async b => {
+      const cSnap = await getCountFromServer(collection(db, 'brands', b.id, 'products'))
+      counts[b.id] = cSnap.data().count
+    }))
+    setProductCounts(counts)
     setLoading(false)
   }
 
   useEffect(() => { load() }, [])
 
-  async function handleDelete(id) {
+  async function handleDelete(e, id) {
+    e.stopPropagation()
     if (!confirm('確定要刪除這個品牌嗎？')) return
     await deleteDoc(doc(db, 'brands', id))
     setBrands(prev => prev.filter(b => b.id !== id))
@@ -51,10 +62,7 @@ export default function Brands() {
           title="還沒有品牌紀錄"
           description="記錄嬛嬛喜歡的品牌"
           action={
-            <button
-              onClick={() => navigate('/brands/new')}
-              className="bg-[#4AAFDC] text-white px-5 py-2 rounded-xl font-semibold text-sm cursor-pointer"
-            >
+            <button onClick={() => navigate('/brands/new')} className="bg-[#4AAFDC] text-white px-5 py-2 rounded-xl font-semibold text-sm cursor-pointer">
               新增品牌
             </button>
           }
@@ -62,28 +70,31 @@ export default function Brands() {
       ) : (
         <div className="space-y-2">
           {brands.map(brand => (
-            <Card key={brand.id} className="px-4 py-3 flex items-center gap-3">
+            <Card key={brand.id} className="px-4 py-3 flex items-center gap-3" onClick={() => navigate(`/brands/${brand.id}`)}>
               <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
                 style={{ background: CAT_COLORS[brand.category] || '#7BAEC8' }}>
                 {brand.name?.[0] || '?'}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-[#1A4F6E] truncate">{brand.name}</p>
-                <p className="text-xs text-[#7BAEC8]">{CATEGORIES[brand.category] || brand.category}</p>
-                {brand.note && <p className="text-xs text-[#7BAEC8] truncate">{brand.note}</p>}
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-[#7BAEC8]">{CATEGORIES[brand.category] || brand.category}</p>
+                  {productCounts[brand.id] > 0 && (
+                    <span className="text-xs bg-[#F2F9FC] text-[#3A7EA0] px-1.5 py-0.5 rounded-md font-medium">
+                      {productCounts[brand.id]} 個產品
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-0.5 flex-shrink-0">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    size={12}
-                    className={i < (brand.rating || 0) ? 'fill-[#4AAFDC] text-[#4AAFDC]' : 'text-[#B0D8EE]'}
-                  />
+                  <Star key={i} size={12} className={i < (brand.rating || 0) ? 'fill-[#4AAFDC] text-[#4AAFDC]' : 'text-[#B0D8EE]'} />
                 ))}
               </div>
-              <button onClick={() => handleDelete(brand.id)} className="text-[#B0D8EE] hover:text-[#F87171] transition-colors cursor-pointer ml-1">
+              <button onClick={e => handleDelete(e, brand.id)} className="text-[#B0D8EE] hover:text-[#F87171] transition-colors cursor-pointer ml-1">
                 <Trash2 size={16} />
               </button>
+              <ChevronRight size={16} className="text-[#B0D8EE]" />
             </Card>
           ))}
         </div>

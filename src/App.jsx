@@ -15,6 +15,8 @@ import Reports from './pages/Reports'
 import More from './pages/More'
 import Shopping from './pages/Shopping'
 import ShoppingNew from './pages/ShoppingNew'
+import BrandDetail from './pages/BrandDetail'
+import BrandProductNew from './pages/BrandProductNew'
 
 export default function App() {
   return (
@@ -26,6 +28,8 @@ export default function App() {
           <Route path="/shopping/new" element={<ShoppingNew />} />
           <Route path="/brands" element={<Brands />} />
           <Route path="/brands/new" element={<BrandsNew />} />
+          <Route path="/brands/:id" element={<BrandDetail />} />
+          <Route path="/brands/:id/products/new" element={<BrandProductNew />} />
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/expenses/new" element={<ExpensesNew />} />
           <Route path="/health" element={<Health />} />
