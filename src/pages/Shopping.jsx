@@ -34,7 +34,6 @@ export default function Shopping() {
   }
 
   async function handleDelete(id) {
-    if (!confirm('確定要刪除這筆紀錄嗎？')) return
     await deleteDoc(doc(db, 'shopping', id))
     setItems(prev => prev.filter(i => i.id !== id))
   }
