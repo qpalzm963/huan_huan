@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import Card from '../components/Card'
-import { UtensilsCrossed, Camera, BarChart2 } from 'lucide-react'
+import { UtensilsCrossed, Camera, BarChart2, ShoppingCart } from 'lucide-react'
 
 const items = [
+  { icon: ShoppingCart, label: '購物清單', sub: '記錄預計購買的項目', to: '/shopping', color: '#F97316' },
   { icon: UtensilsCrossed, label: '飲食日誌', sub: '記錄每天吃了什麼', to: '/diet', color: '#34D399' },
   { icon: Camera, label: '照片日記', sub: '記錄嬛嬛的可愛瞬間', to: '/photos', color: '#A78BFA' },
   { icon: BarChart2, label: '報表', sub: '花費統計與體重趨勢', to: '/reports', color: '#4AAFDC' },

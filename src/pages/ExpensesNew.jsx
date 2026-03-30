@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { collection, addDoc, Timestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import PageHeader from '../components/PageHeader'
@@ -13,8 +13,10 @@ const CATEGORIES = [
 
 export default function ExpensesNew() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const prefill = location.state || {}
   const today = new Date().toISOString().split('T')[0]
-  const [form, setForm] = useState({ name: '', amount: '', category: 'food', date: today, note: '' })
+  const [form, setForm] = useState({ name: prefill.name || '', amount: prefill.amount || '', category: prefill.category || 'food', date: today, note: '' })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 

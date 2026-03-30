@@ -1,12 +1,12 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { Home, Tag, Wallet, Heart, MoreHorizontal } from 'lucide-react'
+import { Home, Tag, Wallet, Heart, ShoppingCart } from 'lucide-react'
 
 const navItems = [
   { to: '/', icon: Home, label: '首頁' },
   { to: '/brands', icon: Tag, label: '品牌' },
   { to: '/expenses', icon: Wallet, label: '花費' },
   { to: '/health', icon: Heart, label: '健康' },
-  { to: '/more', icon: MoreHorizontal, label: '更多' },
+  { to: '/shopping', icon: ShoppingCart, label: '清單' },
 ]
 
 export default function Layout() {

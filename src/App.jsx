@@ -13,6 +13,8 @@ import Photos from './pages/Photos'
 import PhotosNew from './pages/PhotosNew'
 import Reports from './pages/Reports'
 import More from './pages/More'
+import Shopping from './pages/Shopping'
+import ShoppingNew from './pages/ShoppingNew'
 
 export default function App() {
   return (
@@ -20,6 +22,8 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/shopping" element={<Shopping />} />
+          <Route path="/shopping/new" element={<ShoppingNew />} />
           <Route path="/brands" element={<Brands />} />
           <Route path="/brands/new" element={<BrandsNew />} />
           <Route path="/expenses" element={<Expenses />} />
