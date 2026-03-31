@@ -17,6 +17,8 @@ import Shopping from './pages/Shopping'
 import ShoppingNew from './pages/ShoppingNew'
 import BrandDetail from './pages/BrandDetail'
 import BrandProductNew from './pages/BrandProductNew'
+import BrandProductEdit from './pages/BrandProductEdit'
+import BrandProductPrices from './pages/BrandProductPrices'
 
 export default function App() {
   return (
@@ -30,6 +32,8 @@ export default function App() {
           <Route path="/brands/new" element={<BrandsNew />} />
           <Route path="/brands/:id" element={<BrandDetail />} />
           <Route path="/brands/:id/products/new" element={<BrandProductNew />} />
+          <Route path="/brands/:id/products/:pid/edit" element={<BrandProductEdit />} />
+          <Route path="/brands/:id/products/:pid/prices" element={<BrandProductPrices />} />
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/expenses/new" element={<ExpensesNew />} />
           <Route path="/health" element={<Health />} />

@@ -6,7 +6,7 @@ import { db, storage } from '../firebase'
 import Card from '../components/Card'
 import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
-import { Plus, Trash2, Star, Camera, Pencil } from 'lucide-react'
+import { Plus, Trash2, Star, Camera, Pencil, ChartLine } from 'lucide-react'
 import { BrandAvatar, LOCAL_ICONS } from './Brands'
 
 const PROD_CATEGORIES = { food: '食品', snack: '零食', litter: '貓砂', supplies: '用品', health: '保健品' }
@@ -143,6 +143,9 @@ export default function BrandDetail() {
                       <p className="text-xs font-semibold text-[#4AAFDC] mt-0.5">${p.price.toLocaleString()}</p>
                     )}
                   </div>
+                  <button onClick={() => navigate(`/brands/${id}/products/${p.id}/prices`)} className="text-[#B0D8EE] hover:text-[#4AAFDC] transition-colors cursor-pointer">
+                    <ChartLine size={15} />
+                  </button>
                   <button onClick={() => navigate(`/brands/${id}/products/${p.id}/edit`)} className="text-[#B0D8EE] hover:text-[#4AAFDC] transition-colors cursor-pointer">
                     <Pencil size={15} />
                   </button>
