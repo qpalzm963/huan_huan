@@ -22,7 +22,7 @@ export default function BrandProductNew() {
 
   const [file, setFile] = useState(null)
   const [preview, setPreview] = useState(null)
-  const [form, setForm] = useState({ name: '', category: 'food', rating: 0, note: '' })
+  const [form, setForm] = useState({ name: '', category: 'food', rating: 0, note: '', price: '' })
   const [progress, setProgress] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -67,6 +67,7 @@ export default function BrandProductNew() {
         category: form.category,
         rating: form.rating,
         note: form.note.trim(),
+        ...(form.price !== '' && { price: Number(form.price) }),
         ...(url && { url, path }),
         createdAt: Timestamp.now(),
       })
@@ -143,6 +144,21 @@ export default function BrandProductNew() {
             {form.rating > 0 && (
               <button type="button" onClick={() => set('rating', 0)} className="text-xs text-[#7BAEC8] cursor-pointer">清除</button>
             )}
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">單價（選填）</label>
+          <div className="relative mt-1">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#7BAEC8]">$</span>
+            <input
+              value={form.price}
+              onChange={e => set('price', e.target.value)}
+              type="number"
+              min="0"
+              placeholder="0"
+              className="w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl pl-8 pr-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]"
+            />
           </div>
         </div>
 
