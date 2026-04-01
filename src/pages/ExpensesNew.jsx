@@ -47,7 +47,7 @@ export default function ExpensesNew() {
   }
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col min-h-full" style={{background:'#F5F0EB'}}>
       <PageHeader title="新增花費" />
       <form onSubmit={handleSubmit} className="p-4 space-y-4 flex-1">
         {/* Category Tabs */}
@@ -78,7 +78,7 @@ export default function ExpensesNew() {
             value={form.name}
             onChange={e => set('name', e.target.value)}
             placeholder="例：皇家 室內成貓 2kg"
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]"
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]"
           />
         </div>
 
@@ -94,7 +94,7 @@ export default function ExpensesNew() {
               onChange={e => set('amount', e.target.value)}
               placeholder="0"
               min="0"
-              className="w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl pl-8 pr-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]"
+              className="w-full bg-white border border-[#B0D8EE] rounded-xl pl-8 pr-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]"
             />
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function ExpensesNew() {
             type="date"
             value={form.date}
             onChange={e => set('date', e.target.value)}
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]"
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]"
           />
         </div>
 
@@ -118,7 +118,7 @@ export default function ExpensesNew() {
             onChange={e => set('note', e.target.value)}
             placeholder="任何補充說明..."
             rows={2}
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none"
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none"
           />
         </div>
 

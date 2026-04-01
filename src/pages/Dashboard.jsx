@@ -2,11 +2,24 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
-import Card from '../components/Card'
-import { BarChart2 } from 'lucide-react'
 
 const EXPENSE_CATEGORIES = { food: '食品', medical: '醫療', supplies: '用品', other: '其他' }
-const CAT_CATEGORY_COLORS = { food: '#4AAFDC', medical: '#F87171', supplies: '#34D399', other: '#A78BFA' }
+const CAT_CATEGORY_COLORS = { food: '#5BB8E8', medical: '#F87171', supplies: '#34D399', other: '#C084FC' }
+
+const QUICK_ACTIONS = [
+  { label: '記帳', to: '/expenses/new', bg: '#1A4F6E', fg: '#fff' },
+  { label: '飲食', to: '/diet/new', bg: '#E8F7EC', fg: '#1a6e3a' },
+  { label: '健康', to: '/health/new', bg: '#FEE2E2', fg: '#991b1b' },
+  { label: '照片', to: '/photos/new', bg: '#EDE9FE', fg: '#5b21b6' },
+  { label: '清單', to: '/shopping/new', bg: '#FEF9C3', fg: '#713f12' },
+]
+
+const SHORTCUTS = [
+  { label: '品牌', emoji: '🏷️', to: '/brands' },
+  { label: '健康紀錄', emoji: '🩺', to: '/health' },
+  { label: '照片日記', emoji: '🌿', to: '/photos' },
+  { label: '報表', emoji: '📊', to: '/reports' },
+]
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -17,136 +30,303 @@ export default function Dashboard() {
   useEffect(() => {
     async function load() {
       try {
-        const expQ = query(collection(db, 'expenses'), orderBy('date', 'desc'), limit(3))
+        const expQ = query(collection(db, 'expenses'), orderBy('date', 'desc'), limit(4))
         const snap = await getDocs(expQ)
-        const expenses = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-        setRecentExpenses(expenses)
+        setRecentExpenses(snap.docs.map(d => ({ id: d.id, ...d.data() })))
 
         const now = new Date()
         const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
-        const allExp = query(collection(db, 'expenses'), orderBy('date', 'desc'))
-        const allSnap = await getDocs(allExp)
-        const total = allSnap.docs
-          .map(d => d.data())
-          .filter(d => d.date >= monthStart)
-          .reduce((sum, d) => sum + (d.amount || 0), 0)
+        const allSnap = await getDocs(query(collection(db, 'expenses'), orderBy('date', 'desc')))
+        const total = allSnap.docs.map(d => d.data()).filter(d => d.date >= monthStart).reduce((s, d) => s + (d.amount || 0), 0)
         setMonthTotal(total)
-      } catch (e) {
-        console.error(e)
-      } finally {
-        setLoading(false)
-      }
+      } catch (e) { console.error(e) }
+      finally { setLoading(false) }
     }
     load()
   }, [])
 
+  const now = new Date()
+  const monthLabel = `${now.getMonth() + 1}月`
+
   return (
-    <div className="p-4 space-y-4">
-      {/* Cat Hero Card */}
-      <Card className="p-4">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4AAFDC] to-[#B0D8EE] flex items-center justify-center text-3xl flex-shrink-0">
-            🐱
-          </div>
+    <div className="min-h-full" style={{ background: '#F5F0EB', fontFamily: 'system-ui' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Noto+Serif+TC:wght@400;600&display=swap');
+
+        .dash-hero {
+          position: relative;
+          padding: 28px 24px 0;
+          overflow: hidden;
+        }
+        .dash-blob {
+          position: absolute;
+          top: -60px;
+          right: -80px;
+          width: 280px;
+          height: 280px;
+          background: radial-gradient(ellipse at 40% 40%, #C8E8F7 0%, #A8D5EE 50%, transparent 80%);
+          border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+          opacity: 0.55;
+          pointer-events: none;
+        }
+        .dash-blob-2 {
+          position: absolute;
+          bottom: -40px;
+          left: -60px;
+          width: 200px;
+          height: 200px;
+          background: radial-gradient(ellipse, #FFE4C8 0%, transparent 70%);
+          border-radius: 50% 30% 60% 40% / 40% 50% 50% 60%;
+          opacity: 0.6;
+          pointer-events: none;
+        }
+        .cat-avatar {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #1A4F6E 0%, #4AAFDC 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+          flex-shrink: 0;
+          box-shadow: 0 4px 12px rgba(26,79,110,0.2);
+        }
+        .hero-name {
+          font-family: 'Caveat', cursive;
+          font-size: 36px;
+          font-weight: 700;
+          color: #1A4F6E;
+          line-height: 1;
+          letter-spacing: -0.5px;
+        }
+        .hero-month-label {
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          color: #7BAEC8;
+          text-transform: uppercase;
+          margin-top: 14px;
+        }
+        .hero-amount {
+          font-family: 'Caveat', cursive;
+          font-size: 56px;
+          font-weight: 700;
+          color: #1A4F6E;
+          line-height: 1.05;
+          letter-spacing: -2px;
+        }
+        .hero-amount-currency {
+          font-size: 28px;
+          opacity: 0.5;
+          margin-right: 2px;
+        }
+        .divider-line {
+          height: 1px;
+          background: linear-gradient(to right, #C8DDE8 0%, transparent 100%);
+          margin: 0 24px;
+        }
+        .section-label {
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.15em;
+          color: #9BBDD0;
+          text-transform: uppercase;
+        }
+        .quick-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 9px 18px;
+          border-radius: 100px;
+          font-size: 13px;
+          font-weight: 600;
+          white-space: nowrap;
+          cursor: pointer;
+          border: none;
+          transition: transform 0.12s, box-shadow 0.12s;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .quick-pill:active { transform: scale(0.95); }
+        .quick-pill-primary {
+          background: #1A4F6E;
+          color: #fff;
+          box-shadow: 0 3px 10px rgba(26,79,110,0.25);
+        }
+        .shortcut-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+          padding: 14px 8px;
+          background: rgba(255,255,255,0.7);
+          border-radius: 18px;
+          border: 1px solid rgba(176,216,238,0.5);
+          cursor: pointer;
+          transition: transform 0.12s, background 0.12s;
+          -webkit-tap-highlight-color: transparent;
+          backdrop-filter: blur(4px);
+        }
+        .shortcut-item:active { transform: scale(0.94); background: rgba(255,255,255,0.9); }
+        .shortcut-emoji { font-size: 22px; }
+        .shortcut-label { font-size: 10px; font-weight: 600; color: #4A7A96; letter-spacing: 0.02em; }
+        .expense-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 13px 0;
+          border-bottom: 1px solid rgba(176,216,238,0.25);
+          cursor: pointer;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .expense-row:last-child { border-bottom: none; }
+        .expense-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+        .expense-name {
+          flex: 1;
+          font-size: 14px;
+          font-weight: 500;
+          color: #1A4F6E;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .expense-meta {
+          font-size: 11px;
+          color: #9BBDD0;
+          white-space: nowrap;
+        }
+        .expense-amount {
+          font-family: 'Caveat', cursive;
+          font-size: 18px;
+          font-weight: 700;
+          color: #2A6F96;
+          flex-shrink: 0;
+        }
+        .skeleton {
+          background: linear-gradient(90deg, rgba(176,216,238,0.2) 25%, rgba(176,216,238,0.4) 50%, rgba(176,216,238,0.2) 75%);
+          background-size: 200% 100%;
+          animation: shimmer 1.4s infinite;
+          border-radius: 8px;
+          height: 18px;
+        }
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        .fade-in {
+          animation: fadeUp 0.4s ease both;
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
+      {/* Hero */}
+      <div className="dash-hero" style={{ paddingBottom: 24 }}>
+        <div className="dash-blob" />
+        <div className="dash-blob-2" />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
+          <div className="cat-avatar">🐱</div>
           <div>
-            <h1 className="font-['Caveat'] text-2xl font-bold text-[#1A4F6E]">嬛嬛</h1>
-            <p className="text-sm text-[#7BAEC8]">本月花費</p>
-            <p className="font-['Caveat'] text-xl font-bold text-[#3A7EA0]">
-              ${monthTotal.toLocaleString()}
-            </p>
+            <div className="hero-name">嬛嬛</div>
+            <div style={{ fontSize: 12, color: '#7BAEC8', fontWeight: 500, marginTop: 2 }}>的日記本</div>
           </div>
-          <button
-            onClick={() => navigate('/reports')}
-            className="ml-auto p-2 rounded-xl text-[#7BAEC8] hover:bg-[#F2F9FC] transition-colors cursor-pointer"
-            aria-label="查看報表"
-          >
-            <BarChart2 size={22} />
-          </button>
         </div>
-      </Card>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: '品牌', emoji: '🏷️', to: '/brands' },
-          { label: '健康', emoji: '❤️', to: '/health' },
-          { label: '照片', emoji: '📷', to: '/photos' },
-        ].map(({ label, emoji, to }) => (
-          <Card key={to} className="p-3 text-center" onClick={() => navigate(to)}>
-            <div className="text-2xl mb-1">{emoji}</div>
-            <p className="text-xs text-[#7BAEC8] font-medium">{label}</p>
-          </Card>
-        ))}
-      </div>
-
-      {/* Recent Expenses */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="font-['Caveat'] text-lg font-semibold text-[#1A4F6E]">最近花費</h2>
-          <button
-            onClick={() => navigate('/expenses')}
-            className="text-xs text-[#3A7EA0] font-medium cursor-pointer"
-          >
-            查看全部
-          </button>
+        <div style={{ position: 'relative', marginTop: 20 }}>
+          <div className="hero-month-label">{monthLabel} · 花費總計</div>
+          <div className="hero-amount">
+            <span className="hero-amount-currency">$</span>
+            {loading ? '—' : monthTotal.toLocaleString()}
+          </div>
         </div>
-        {loading ? (
-          <div className="space-y-2">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-14 bg-white rounded-2xl border border-[#B0D8EE] animate-pulse" />
-            ))}
-          </div>
-        ) : recentExpenses.length === 0 ? (
-          <Card className="p-4 text-center">
-            <p className="text-sm text-[#7BAEC8]">還沒有花費紀錄</p>
-            <button
-              onClick={() => navigate('/expenses/new')}
-              className="mt-2 text-sm text-[#4AAFDC] font-semibold cursor-pointer"
-            >
-              新增第一筆
-            </button>
-          </Card>
-        ) : (
-          <div className="space-y-2">
-            {recentExpenses.map(exp => (
-              <Card key={exp.id} className="px-4 py-3 flex items-center gap-3">
-                <div
-                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                  style={{ background: CAT_CATEGORY_COLORS[exp.category] || '#7BAEC8' }}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#1A4F6E] truncate">{exp.name}</p>
-                  <p className="text-xs text-[#7BAEC8]">{EXPENSE_CATEGORIES[exp.category]} · {exp.date}</p>
-                </div>
-                <p className="font-['Caveat'] text-lg font-bold text-[#3A7EA0] flex-shrink-0">
-                  ${exp.amount?.toLocaleString()}
-                </p>
-              </Card>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Quick Actions */}
-      <div>
-        <h2 className="font-['Caveat'] text-lg font-semibold text-[#1A4F6E] mb-2">快速新增</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { label: '記帳', to: '/expenses/new', color: '#4AAFDC' },
-            { label: '飲食', to: '/diet/new', color: '#34D399' },
-            { label: '健康', to: '/health/new', color: '#F87171' },
-            { label: '照片', to: '/photos/new', color: '#A78BFA' },
-          ].map(({ label, to, color }) => (
+      <div style={{ padding: '0 24px 20px' }}>
+        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none' }}>
+          {QUICK_ACTIONS.map(({ label, to, bg, fg }) => (
             <button
               key={to}
+              className="quick-pill"
+              style={{ background: bg, color: fg }}
               onClick={() => navigate(to)}
-              className="py-3 rounded-2xl text-white font-semibold text-sm cursor-pointer transition-opacity active:opacity-80"
-              style={{ background: color }}
             >
               + {label}
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="divider-line" />
+
+      {/* Shortcuts */}
+      <div style={{ padding: '20px 24px' }}>
+        <div className="section-label" style={{ marginBottom: 12 }}>快速導覽</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+          {SHORTCUTS.map(({ label, emoji, to }) => (
+            <div key={to} className="shortcut-item" onClick={() => navigate(to)}>
+              <span className="shortcut-emoji">{emoji}</span>
+              <span className="shortcut-label">{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="divider-line" />
+
+      {/* Recent Expenses */}
+      <div style={{ padding: '20px 24px 32px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div className="section-label">最近花費</div>
+          <button
+            onClick={() => navigate('/expenses')}
+            style={{ fontSize: 12, color: '#4AAFDC', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
+            全部 →
+          </button>
+        </div>
+
+        {loading ? (
+          <div style={{ paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {[1,2,3].map(i => (
+              <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <div className="skeleton" style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0 }} />
+                <div className="skeleton" style={{ flex: 1 }} />
+                <div className="skeleton" style={{ width: 52 }} />
+              </div>
+            ))}
+          </div>
+        ) : recentExpenses.length === 0 ? (
+          <div style={{ paddingTop: 20, textAlign: 'center' }}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>🌱</div>
+            <p style={{ fontSize: 13, color: '#9BBDD0', marginBottom: 12 }}>還沒有花費紀錄</p>
+            <button
+              onClick={() => navigate('/expenses/new')}
+              style={{ fontSize: 13, color: '#1A4F6E', fontWeight: 700, background: 'rgba(255,255,255,0.8)', border: '1px solid #B0D8EE', borderRadius: 100, padding: '8px 20px', cursor: 'pointer' }}
+            >
+              新增第一筆
+            </button>
+          </div>
+        ) : (
+          <div className="fade-in">
+            {recentExpenses.map(exp => (
+              <div key={exp.id} className="expense-row" onClick={() => navigate('/expenses')}>
+                <div className="expense-dot" style={{ background: CAT_CATEGORY_COLORS[exp.category] || '#7BAEC8' }} />
+                <div className="expense-name">{exp.name}</div>
+                <div className="expense-meta">{EXPENSE_CATEGORIES[exp.category]} · {exp.date?.slice(5)}</div>
+                <div className="expense-amount">${exp.amount?.toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

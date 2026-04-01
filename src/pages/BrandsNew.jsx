@@ -35,7 +35,7 @@ export default function BrandsNew() {
   }
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col min-h-full" style={{background:'#F5F0EB'}}>
       <PageHeader title="新增品牌" />
       <form onSubmit={handleSubmit} className="p-4 space-y-4 flex-1">
         <div>
@@ -44,7 +44,7 @@ export default function BrandsNew() {
             value={form.name}
             onChange={e => set('name', e.target.value)}
             placeholder="例：皇家 Royal Canin"
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]"
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]"
           />
         </div>
 
@@ -69,7 +69,7 @@ export default function BrandsNew() {
             onChange={e => set('note', e.target.value)}
             placeholder="嬛嬛喜不喜歡？有什麼特別之處..."
             rows={3}
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none"
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none"
           />
         </div>
 

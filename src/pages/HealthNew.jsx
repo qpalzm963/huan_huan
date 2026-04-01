@@ -46,7 +46,7 @@ export default function HealthNew() {
   }
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col min-h-full" style={{background:'#F5F0EB'}}>
       <PageHeader title="新增健康紀錄" />
       <form onSubmit={handleSubmit} className="p-4 space-y-4 flex-1">
         {/* Type */}
@@ -65,14 +65,14 @@ export default function HealthNew() {
         <div>
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">日期</label>
           <input type="date" value={form.date} onChange={e => set('date', e.target.value)}
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]" />
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]" />
         </div>
 
         {type === 'weight' && (
           <div>
             <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">體重 (kg)</label>
             <input type="number" inputMode="decimal" step="0.01" value={form.weight} onChange={e => set('weight', e.target.value)} placeholder="4.20"
-              className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
+              className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
           </div>
         )}
 
@@ -81,12 +81,12 @@ export default function HealthNew() {
             <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">品項名稱</label>
             <input value={form.name} onChange={e => set('name', e.target.value)}
               placeholder={type === 'vaccine' ? '例：三合一疫苗' : type === 'deworming_internal' ? '例：Revolution' : '例：Frontline'}
-              className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
+              className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
           </div>
           <div>
             <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">下次到期日（選填）</label>
             <input type="date" value={form.nextDate} onChange={e => set('nextDate', e.target.value)}
-              className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]" />
+              className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]" />
           </div>
         </>)}
 
@@ -94,19 +94,19 @@ export default function HealthNew() {
           <div>
             <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">診所名稱（選填）</label>
             <input value={form.clinic} onChange={e => set('clinic', e.target.value)} placeholder="例：XX 動物醫院"
-              className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
+              className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
           </div>
           <div>
             <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">看診原因</label>
             <input value={form.reason} onChange={e => set('reason', e.target.value)} placeholder="例：年度健康檢查"
-              className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
+              className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
           </div>
         </>)}
 
         <div>
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">備註（選填）</label>
           <textarea value={form.note} onChange={e => set('note', e.target.value)} placeholder="任何補充說明..." rows={2}
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none" />
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none" />
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}

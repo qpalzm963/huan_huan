@@ -15,6 +15,7 @@ import Reports from './pages/Reports'
 import More from './pages/More'
 import Shopping from './pages/Shopping'
 import ShoppingNew from './pages/ShoppingNew'
+import ShoppingDetail from './pages/ShoppingDetail'
 import BrandDetail from './pages/BrandDetail'
 import BrandProductNew from './pages/BrandProductNew'
 import BrandProductEdit from './pages/BrandProductEdit'
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/shopping" element={<Shopping />} />
           <Route path="/shopping/new" element={<ShoppingNew />} />
+          <Route path="/shopping/:id" element={<ShoppingDetail />} />
           <Route path="/brands" element={<Brands />} />
           <Route path="/brands/new" element={<BrandsNew />} />
           <Route path="/brands/:id" element={<BrandDetail />} />

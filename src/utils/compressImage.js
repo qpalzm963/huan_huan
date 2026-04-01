@@ -21,7 +21,7 @@ export async function compressImage(file, maxSize = 1024, quality = 0.85) {
       canvas.toBlob(blob => {
         if (blob) resolve(blob)
         else reject(new Error('compression failed'))
-      }, 'image/jpeg', quality)
+      }, 'image/webp', quality)
     }
     img.onerror = reject
     img.src = url

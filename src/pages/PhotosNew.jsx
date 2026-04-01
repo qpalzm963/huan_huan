@@ -5,6 +5,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import { db, storage } from '../firebase'
 import PageHeader from '../components/PageHeader'
 import { ImagePlus } from 'lucide-react'
+import { compressImage } from '../utils/compressImage'
 
 export default function PhotosNew() {
   const navigate = useNavigate()
@@ -23,11 +24,12 @@ export default function PhotosNew() {
     setError('')
   }
 
-  function handleFile(e) {
+  async function handleFile(e) {
     const f = e.target.files[0]
     if (!f) return
-    setFile(f)
-    setPreview(URL.createObjectURL(f))
+    const compressed = await compressImage(f, 1920, 0.85)
+    setFile(compressed)
+    setPreview(URL.createObjectURL(compressed))
     setError('')
   }
 
@@ -36,8 +38,7 @@ export default function PhotosNew() {
     if (!file) { setError('請選擇一張照片'); return }
     setSaving(true)
     try {
-      const ext = file.name.split('.').pop()
-      const path = `photos/${Date.now()}.${ext}`
+      const path = `photos/${Date.now()}.webp`
       const storageRef = ref(storage, path)
       const task = uploadBytesResumable(storageRef, file)
 
@@ -66,14 +67,14 @@ export default function PhotosNew() {
   }
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col min-h-full" style={{background:'#F5F0EB'}}>
       <PageHeader title="新增照片" />
       <form onSubmit={handleSubmit} className="p-4 space-y-4 flex-1">
 
         {/* 照片選擇 */}
         <div
           onClick={() => !saving && fileRef.current.click()}
-          className="relative w-full aspect-square rounded-2xl border-2 border-dashed border-[#B0D8EE] bg-[#F2F9FC] flex items-center justify-center overflow-hidden cursor-pointer active:opacity-80"
+          className="relative w-full aspect-square rounded-2xl border-2 border-dashed border-[#B0D8EE] bg-white flex items-center justify-center overflow-hidden cursor-pointer active:opacity-80"
         >
           {preview ? (
             <img src={preview} alt="preview" className="w-full h-full object-cover" />
@@ -97,19 +98,19 @@ export default function PhotosNew() {
         <div>
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">標題（選填）</label>
           <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="例：曬太陽的嬛嬛"
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
         </div>
 
         <div>
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">日期</label>
           <input type="date" value={form.date} onChange={e => set('date', e.target.value)}
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]" />
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]" />
         </div>
 
         <div>
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">備註（選填）</label>
           <textarea value={form.note} onChange={e => set('note', e.target.value)} placeholder="任何補充說明..." rows={2}
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none" />
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none" />
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}

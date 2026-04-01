@@ -64,7 +64,7 @@ export default function BrandProductEdit() {
       }
 
       if (file) {
-        const storageRef = ref(storage, `products/${id}/${pid}.jpg`)
+        const storageRef = ref(storage, `products/${id}/${pid}.webp`)
         const task = uploadBytesResumable(storageRef, file)
         await new Promise((resolve, reject) => {
           task.on('state_changed',
@@ -73,7 +73,7 @@ export default function BrandProductEdit() {
           )
         })
         updates.url = await getDownloadURL(storageRef)
-        updates.path = `products/${id}/${pid}.jpg`
+        updates.path = `products/${id}/${pid}.webp`
       }
 
       await updateDoc(doc(db, 'brands', id, 'products', pid), updates)
@@ -87,7 +87,7 @@ export default function BrandProductEdit() {
   if (!form) return <div className="p-4 text-[#7BAEC8]">載入中...</div>
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col min-h-full" style={{background:'#F5F0EB'}}>
       <PageHeader title="編輯產品" />
       <form onSubmit={handleSubmit} className="p-4 space-y-4 flex-1">
 
@@ -95,7 +95,7 @@ export default function BrandProductEdit() {
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">產品圖片（選填）</label>
           <div
             onClick={() => !saving && fileRef.current.click()}
-            className="relative mt-2 w-full h-40 rounded-2xl border-2 border-dashed border-[#B0D8EE] bg-[#F2F9FC] flex items-center justify-center overflow-hidden cursor-pointer active:opacity-80"
+            className="relative mt-2 w-full h-40 rounded-2xl border-2 border-dashed border-[#B0D8EE] bg-white flex items-center justify-center overflow-hidden cursor-pointer active:opacity-80"
           >
             {preview ? (
               <img src={preview} alt="preview" className="w-full h-full object-contain" />
@@ -133,7 +133,7 @@ export default function BrandProductEdit() {
         <div>
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">產品名稱</label>
           <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="例：室內成貓 2kg"
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
         </div>
 
         <div>
@@ -160,7 +160,7 @@ export default function BrandProductEdit() {
               type="number"
               min="0"
               placeholder="0"
-              className="w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl pl-8 pr-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]"
+              className="w-full bg-white border border-[#B0D8EE] rounded-xl pl-8 pr-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]"
             />
           </div>
         </div>
@@ -168,7 +168,7 @@ export default function BrandProductEdit() {
         <div>
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">備註（選填）</label>
           <textarea value={form.note} onChange={e => set('note', e.target.value)} placeholder="嬛嬛的反應如何？" rows={3}
-            className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none" />
+            className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none" />
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}
