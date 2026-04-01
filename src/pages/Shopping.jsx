@@ -15,10 +15,18 @@ export default function Shopping() {
   const [loading, setLoading] = useState(true)
 
   async function load() {
-    const q = query(collection(db, 'shopping'), orderBy('done'), orderBy('createdAt', 'desc'))
-    const snap = await getDocs(q)
-    setItems(snap.docs.map(d => ({ id: d.id, ...d.data() })))
-    setLoading(false)
+    try {
+      const q = query(collection(db, 'shopping'), orderBy('createdAt', 'desc'))
+      const snap = await getDocs(q)
+      const all = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      // sort: pending first, then done
+      all.sort((a, b) => (a.done === b.done ? 0 : a.done ? 1 : -1))
+      setItems(all)
+    } catch (e) {
+      console.error('shopping load error', e)
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [])
@@ -44,8 +52,8 @@ export default function Shopping() {
     })
   }
 
-  const pending = items.filter(i => !i.done)
-  const done = items.filter(i => i.done)
+  const pending = items.filter(i => !i.done && i.name)
+  const done = items.filter(i => i.done && i.name)
 
   return (
     <div className="p-4">
@@ -63,7 +71,7 @@ export default function Shopping() {
         <div className="space-y-2">
           {[1,2,3].map(i => <div key={i} className="h-16 bg-white rounded-2xl border border-[#B0D8EE] animate-pulse" />)}
         </div>
-      ) : items.length === 0 ? (
+      ) : pending.length === 0 && done.length === 0 ? (
         <EmptyState
           icon="🛒"
           title="購物清單是空的"

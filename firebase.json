@@ -4,6 +4,7 @@
     "indexes": "firestore.indexes.json"
   },
   "storage": {
+    "bucket": "huan-huan-def2c.firebasestorage.app",
     "rules": "storage.rules"
   },
   "hosting": {

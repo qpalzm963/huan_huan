@@ -6,8 +6,16 @@ import Card from '../components/Card'
 import EmptyState from '../components/EmptyState'
 import { Plus, Trash2 } from 'lucide-react'
 
-const TABS = ['體重', '疫苗', '看診']
-const TYPE_COLORS = { weight: '#4AAFDC', vaccine: '#34D399', visit: '#F87171' }
+const TABS = ['體重', '預防保健', '看診']
+const TYPE_COLORS = { weight: '#4AAFDC', vaccine: '#34D399', deworming_internal: '#F59E0B', deworming_external: '#A78BFA', visit: '#F87171' }
+
+const PREVENTIVE_BADGE = {
+  vaccine: { label: '疫苗', color: '#34D399' },
+  deworming_internal: { label: '體內驅蟲', color: '#F59E0B' },
+  deworming_external: { label: '體外驅蟲', color: '#A78BFA' },
+}
+
+const PREVENTIVE_TYPES = ['vaccine', 'deworming_internal', 'deworming_external']
 
 export default function Health() {
   const navigate = useNavigate()
@@ -15,7 +23,7 @@ export default function Health() {
   const [records, setRecords] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const types = ['weight', 'vaccine', 'visit']
+  const types = ['weight', null, 'visit']
 
   async function load() {
     setLoading(true)
@@ -33,7 +41,9 @@ export default function Health() {
     setRecords(prev => prev.filter(r => r.id !== id))
   }
 
-  const filtered = records.filter(r => r.type === types[tab])
+  const filtered = tab === 1
+    ? records.filter(r => PREVENTIVE_TYPES.includes(r.type))
+    : records.filter(r => r.type === types[tab])
 
   return (
     <div className="p-4">
@@ -68,7 +78,7 @@ export default function Health() {
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState
-          icon={tab === 0 ? '⚖️' : tab === 1 ? '💉' : '🏥'}
+          icon={tab === 0 ? '⚖️' : tab === 1 ? '💊' : '🏥'}
           title={`還沒有${TABS[tab]}紀錄`}
           action={
             <button
@@ -86,13 +96,21 @@ export default function Health() {
               <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: TYPE_COLORS[r.type] }} />
               <div className="flex-1 min-w-0">
                 {r.type === 'weight' && <p className="text-sm font-semibold text-[#1A4F6E]">{r.weight} kg</p>}
-                {r.type === 'vaccine' && <p className="text-sm font-semibold text-[#1A4F6E] truncate">{r.vaccineName}</p>}
+                {PREVENTIVE_TYPES.includes(r.type) && (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-[#1A4F6E] truncate">{r.name}</p>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
+                        style={{ background: PREVENTIVE_BADGE[r.type].color + '22', color: PREVENTIVE_BADGE[r.type].color }}>
+                        {PREVENTIVE_BADGE[r.type].label}
+                      </span>
+                    </div>
+                    {r.nextDate && <p className="text-xs" style={{ color: PREVENTIVE_BADGE[r.type].color }}>下次：{r.nextDate}</p>}
+                  </>
+                )}
                 {r.type === 'visit' && <p className="text-sm font-semibold text-[#1A4F6E] truncate">{r.clinic} · {r.reason}</p>}
                 <p className="text-xs text-[#7BAEC8]">{r.date}</p>
                 {r.note && <p className="text-xs text-[#7BAEC8] truncate">{r.note}</p>}
-                {r.type === 'vaccine' && r.nextDate && (
-                  <p className="text-xs text-[#34D399]">下次：{r.nextDate}</p>
-                )}
               </div>
               <button onClick={() => handleDelete(r.id)} className="text-[#B0D8EE] hover:text-[#F87171] transition-colors cursor-pointer">
                 <Trash2 size={16} />

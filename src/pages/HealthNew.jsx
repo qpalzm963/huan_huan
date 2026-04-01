@@ -7,6 +7,8 @@ import PageHeader from '../components/PageHeader'
 const TYPES = [
   { value: 'weight', label: '體重' },
   { value: 'vaccine', label: '疫苗' },
+  { value: 'deworming_internal', label: '體內驅蟲' },
+  { value: 'deworming_external', label: '體外驅蟲' },
   { value: 'visit', label: '看診' },
 ]
 
@@ -14,7 +16,8 @@ export default function HealthNew() {
   const navigate = useNavigate()
   const today = new Date().toISOString().split('T')[0]
   const [type, setType] = useState('weight')
-  const [form, setForm] = useState({ date: today, weight: '', vaccineName: '', nextDate: '', clinic: '', reason: '', note: '' })
+  const isPreventive = ['vaccine', 'deworming_internal', 'deworming_external'].includes(type)
+  const [form, setForm] = useState({ date: today, weight: '', name: '', nextDate: '', clinic: '', reason: '', note: '' })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -26,13 +29,13 @@ export default function HealthNew() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (type === 'weight' && (!form.weight || isNaN(form.weight))) { setError('請輸入體重'); return }
-    if (type === 'vaccine' && !form.vaccineName.trim()) { setError('請輸入疫苗名稱'); return }
+    if (isPreventive && !form.name.trim()) { setError('請輸入品項名稱'); return }
     if (type === 'visit' && !form.reason.trim()) { setError('請輸入看診原因'); return }
     setSaving(true)
     try {
       const data = { type, date: form.date, note: form.note.trim(), createdAt: Timestamp.now() }
       if (type === 'weight') data.weight = Number(form.weight)
-      if (type === 'vaccine') { data.vaccineName = form.vaccineName.trim(); data.nextDate = form.nextDate }
+      if (isPreventive) { data.name = form.name.trim(); data.nextDate = form.nextDate }
       if (type === 'visit') { data.clinic = form.clinic.trim(); data.reason = form.reason.trim() }
       await addDoc(collection(db, 'health'), data)
       navigate('/health')
@@ -73,14 +76,15 @@ export default function HealthNew() {
           </div>
         )}
 
-        {type === 'vaccine' && (<>
+        {isPreventive && (<>
           <div>
-            <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">疫苗名稱</label>
-            <input value={form.vaccineName} onChange={e => set('vaccineName', e.target.value)} placeholder="例：三合一疫苗"
+            <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">品項名稱</label>
+            <input value={form.name} onChange={e => set('name', e.target.value)}
+              placeholder={type === 'vaccine' ? '例：三合一疫苗' : type === 'deworming_internal' ? '例：Revolution' : '例：Frontline'}
               className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]" />
           </div>
           <div>
-            <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">下次接種日（選填）</label>
+            <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">下次到期日（選填）</label>
             <input type="date" value={form.nextDate} onChange={e => set('nextDate', e.target.value)}
               className="mt-1 w-full bg-[#F2F9FC] border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]" />
           </div>

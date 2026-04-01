@@ -4,31 +4,49 @@ import { collection, getDocs, deleteDoc, doc, orderBy, query, getCountFromServer
 import { db } from '../firebase'
 import Card from '../components/Card'
 import EmptyState from '../components/EmptyState'
-import { Plus, Trash2, Star, ChevronRight } from 'lucide-react'
+import { Plus, Trash2, Star, ChevronRight, Tag, Package, X } from 'lucide-react'
 
-const CATEGORIES = { food: '食品', snack: '零食', litter: '貓砂', supplies: '用品' }
-const CAT_COLORS = { food: '#4AAFDC', snack: '#F97316', litter: '#34D399', supplies: '#A78BFA' }
+const LOCAL_ICONS = {
+  'PS BUBU': '/huan_huan/brand-icons/ps_bubu.png',
+  '毛掌醫學': '/huan_huan/brand-icons/maozhuang.png',
+  '肉球世界': '/huan_huan/brand-icons/rouqiu.png',
+  '貓有話說': '/huan_huan/brand-icons/maohuashuo.png',
+}
+
+function BrandAvatar({ brand, size = 'sm' }) {
+  const icon = brand.iconUrl || LOCAL_ICONS[brand.name]
+  const cls = size === 'sm' ? 'w-9 h-9 text-xs' : 'w-14 h-14 text-lg'
+  if (icon) return <img src={icon} alt={brand.name} className={`${cls} rounded-xl object-contain bg-white border border-[#B0D8EE] flex-shrink-0`} />
+  return <div className={`${cls} rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0`} style={{ background: '#4AAFDC' }}>{brand.name?.[0] || '?'}</div>
+}
+
+export { BrandAvatar, LOCAL_ICONS }
 
 export default function Brands() {
   const navigate = useNavigate()
   const [brands, setBrands] = useState([])
   const [productCounts, setProductCounts] = useState({})
   const [loading, setLoading] = useState(true)
+  const [sheet, setSheet] = useState(null) // null | 'choice' | 'pick-brand'
 
   async function load() {
-    const q = query(collection(db, 'brands'), orderBy('category'))
-    const snap = await getDocs(q)
-    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-    setBrands(list)
+    try {
+      const q = query(collection(db, 'brands'), orderBy('name'))
+      const snap = await getDocs(q)
+      const list = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      setBrands(list)
 
-    // 讀取各品牌產品數
-    const counts = {}
-    await Promise.all(list.map(async b => {
-      const cSnap = await getCountFromServer(collection(db, 'brands', b.id, 'products'))
-      counts[b.id] = cSnap.data().count
-    }))
-    setProductCounts(counts)
-    setLoading(false)
+      const counts = {}
+      await Promise.all(list.map(async b => {
+        const cSnap = await getCountFromServer(collection(db, 'brands', b.id, 'products'))
+        counts[b.id] = cSnap.data().count
+      }))
+      setProductCounts(counts)
+    } catch (e) {
+      console.error('brands load error', e)
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [])
@@ -45,7 +63,7 @@ export default function Brands() {
       <div className="flex items-center justify-between mb-4">
         <h1 className="font-['Caveat'] text-2xl font-bold text-[#1A4F6E]">品牌管理</h1>
         <button
-          onClick={() => navigate('/brands/new')}
+          onClick={() => setSheet('choice')}
           className="flex items-center gap-1 bg-[#4AAFDC] text-white text-sm font-semibold px-3 py-2 rounded-xl cursor-pointer active:opacity-80"
         >
           <Plus size={16} /> 新增
@@ -71,20 +89,12 @@ export default function Brands() {
         <div className="space-y-2">
           {brands.map(brand => (
             <Card key={brand.id} className="px-4 py-3 flex items-center gap-3" onClick={() => navigate(`/brands/${brand.id}`)}>
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                style={{ background: CAT_COLORS[brand.category] || '#7BAEC8' }}>
-                {brand.name?.[0] || '?'}
-              </div>
+              <BrandAvatar brand={brand} size="sm" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-[#1A4F6E] truncate">{brand.name}</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-xs text-[#7BAEC8]">{CATEGORIES[brand.category] || brand.category}</p>
-                  {productCounts[brand.id] > 0 && (
-                    <span className="text-xs bg-[#F2F9FC] text-[#3A7EA0] px-1.5 py-0.5 rounded-md font-medium">
-                      {productCounts[brand.id]} 個產品
-                    </span>
-                  )}
-                </div>
+                {productCounts[brand.id] > 0 && (
+                  <span className="text-xs text-[#7BAEC8]">{productCounts[brand.id]} 個產品</span>
+                )}
               </div>
               <div className="flex items-center gap-0.5 flex-shrink-0">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -97,6 +107,71 @@ export default function Brands() {
               <ChevronRight size={16} className="text-[#B0D8EE]" />
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Bottom Sheet */}
+      {sheet && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={() => setSheet(null)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative bg-white rounded-t-3xl p-6 space-y-3" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-1">
+              <p className="font-['Caveat'] text-lg font-bold text-[#1A4F6E]">
+                {sheet === 'pick-brand' ? '選擇品牌' : '新增'}
+              </p>
+              <button onClick={() => setSheet(null)} className="text-[#B0D8EE] cursor-pointer">
+                <X size={20} />
+              </button>
+            </div>
+
+            {sheet === 'choice' && (
+              <>
+                <button
+                  onClick={() => { setSheet(null); navigate('/brands/new') }}
+                  className="w-full flex items-center gap-4 bg-[#F2F9FC] rounded-2xl px-4 py-4 cursor-pointer active:opacity-80"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-[#4AAFDC] flex items-center justify-center flex-shrink-0">
+                    <Tag size={18} className="text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-semibold text-[#1A4F6E]">新增品牌</p>
+                    <p className="text-xs text-[#7BAEC8]">新增一個品牌</p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => brands.length > 0 ? setSheet('pick-brand') : navigate('/brands/new')}
+                  className="w-full flex items-center gap-4 bg-[#F2F9FC] rounded-2xl px-4 py-4 cursor-pointer active:opacity-80"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-[#34D399] flex items-center justify-center flex-shrink-0">
+                    <Package size={18} className="text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-semibold text-[#1A4F6E]">新增產品</p>
+                    <p className="text-xs text-[#7BAEC8]">選擇品牌後新增產品</p>
+                  </div>
+                </button>
+              </>
+            )}
+
+            {sheet === 'pick-brand' && (
+              <div className="space-y-2 max-h-72 overflow-y-auto">
+                {brands.map(brand => (
+                  <button
+                    key={brand.id}
+                    onClick={() => { setSheet(null); navigate(`/brands/${brand.id}/products/new`) }}
+                    className="w-full flex items-center gap-3 bg-[#F2F9FC] rounded-2xl px-4 py-3 cursor-pointer active:opacity-80"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-[#4AAFDC] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                      {brand.name?.[0] || '?'}
+                    </div>
+                    <span className="text-sm font-semibold text-[#1A4F6E] truncate">{brand.name}</span>
+                    <ChevronRight size={16} className="text-[#B0D8EE] ml-auto flex-shrink-0" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

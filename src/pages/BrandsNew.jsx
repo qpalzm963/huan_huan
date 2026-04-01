@@ -5,16 +5,9 @@ import { db } from '../firebase'
 import PageHeader from '../components/PageHeader'
 import { Star } from 'lucide-react'
 
-const CATEGORIES = [
-  { value: 'food', label: '食品' },
-  { value: 'snack', label: '零食' },
-  { value: 'litter', label: '貓砂' },
-  { value: 'supplies', label: '用品' },
-]
-
 export default function BrandsNew() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: '', category: 'food', rating: 0, note: '' })
+  const [form, setForm] = useState({ name: '', rating: 0, note: '' })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -30,7 +23,6 @@ export default function BrandsNew() {
     try {
       await addDoc(collection(db, 'brands'), {
         name: form.name.trim(),
-        category: form.category,
         rating: form.rating,
         note: form.note.trim(),
         createdAt: Timestamp.now(),
@@ -46,26 +38,6 @@ export default function BrandsNew() {
     <div className="flex flex-col min-h-full">
       <PageHeader title="新增品牌" />
       <form onSubmit={handleSubmit} className="p-4 space-y-4 flex-1">
-        {/* Category */}
-        <div>
-          <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">分類</label>
-          <div className="flex gap-2 mt-2">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat.value}
-                type="button"
-                onClick={() => set('category', cat.value)}
-                className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                  form.category === cat.value ? 'bg-[#B0D8EE] text-[#1A4F6E]' : 'bg-white border border-[#B0D8EE] text-[#7BAEC8]'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Name */}
         <div>
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">品牌名稱</label>
           <input
@@ -76,33 +48,20 @@ export default function BrandsNew() {
           />
         </div>
 
-        {/* Rating */}
         <div>
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">評分</label>
           <div className="flex items-center gap-2 mt-2">
             {Array.from({ length: 5 }).map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => set('rating', i + 1)}
-                className="cursor-pointer"
-                aria-label={`${i + 1} 星`}
-              >
-                <Star
-                  size={28}
-                  className={i < form.rating ? 'fill-[#4AAFDC] text-[#4AAFDC]' : 'text-[#B0D8EE]'}
-                />
+              <button key={i} type="button" onClick={() => set('rating', i + 1)} className="cursor-pointer" aria-label={`${i + 1} 星`}>
+                <Star size={28} className={i < form.rating ? 'fill-[#4AAFDC] text-[#4AAFDC]' : 'text-[#B0D8EE]'} />
               </button>
             ))}
             {form.rating > 0 && (
-              <button type="button" onClick={() => set('rating', 0)} className="text-xs text-[#7BAEC8] cursor-pointer">
-                清除
-              </button>
+              <button type="button" onClick={() => set('rating', 0)} className="text-xs text-[#7BAEC8] cursor-pointer">清除</button>
             )}
           </div>
         </div>
 
-        {/* Note */}
         <div>
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">備註（選填）</label>
           <textarea
@@ -116,11 +75,8 @@ export default function BrandsNew() {
 
         {error && <p className="text-sm text-red-500">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full bg-[#4AAFDC] text-white py-3.5 rounded-xl font-semibold text-sm cursor-pointer disabled:opacity-60"
-        >
+        <button type="submit" disabled={saving}
+          className="w-full bg-[#4AAFDC] text-white py-3.5 rounded-xl font-semibold text-sm cursor-pointer disabled:opacity-60">
           {saving ? '儲存中...' : '儲存品牌'}
         </button>
       </form>
