@@ -1,8 +1,13 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // 個人 app，無驗證機制
+    // 允許讀寫，但限制單筆欄位數防止惡意資料注入
+    // 建議未來加入 Firebase Authentication + App Check
     match /{document=**} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().size() <= 30;
+      allow delete: if true;
     }
   }
 }
