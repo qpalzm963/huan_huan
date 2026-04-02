@@ -53,13 +53,13 @@ export default function Reports() {
   const totalSpend = expenses.reduce((s, e) => s + (e.amount || 0), 0)
 
   if (loading) return (
-    <div className="p-4 space-y-3">
+    <div className="p-4 space-y-3 min-h-full" style={{ background: '#F5F0EB' }}>
       {[1,2,3].map(i => <div key={i} className="h-40 bg-white rounded-2xl border border-[#B0D8EE] animate-pulse" />)}
     </div>
   )
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4 min-h-full" style={{ background: '#F5F0EB' }}>
       <h1 className="font-['Caveat'] text-2xl font-bold text-[#1A4F6E]">報表</h1>
 
       {/* Total */}

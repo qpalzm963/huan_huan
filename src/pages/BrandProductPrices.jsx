@@ -55,7 +55,7 @@ export default function BrandProductPrices() {
   if (!product) return <div className="p-4 text-[#7BAEC8]">載入中...</div>
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col min-h-full" style={{ background: '#F5F0EB' }}>
       <PageHeader title={`${product.name} 價格紀錄`} />
       <div className="p-4 space-y-4">
 

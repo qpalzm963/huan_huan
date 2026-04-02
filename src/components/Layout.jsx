@@ -11,7 +11,7 @@ const navItems = [
 
 export default function Layout() {
   return (
-    <div className="flex flex-col min-h-dvh bg-[#F2F9FC]">
+    <div className="flex flex-col min-h-dvh bg-[#F5F0EB]">
       {/* Top Bar */}
       <header className="sticky top-0 z-10 bg-white border-b border-[#B0D8EE] px-4 py-3 flex items-center justify-between">
         <span className="font-['Caveat'] text-2xl font-bold text-[#1A4F6E]">嬛嬛日記</span>

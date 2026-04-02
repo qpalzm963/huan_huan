@@ -12,7 +12,7 @@ const items = [
 export default function More() {
   const navigate = useNavigate()
   return (
-    <div className="p-4">
+    <div className="p-4 min-h-full" style={{ background: '#F5F0EB' }}>
       <h1 className="font-['Caveat'] text-2xl font-bold text-[#1A4F6E] mb-4">更多功能</h1>
       <div className="space-y-3">
         {items.map(({ icon: Icon, label, sub, to, color }) => (

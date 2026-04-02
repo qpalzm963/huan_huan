@@ -12,13 +12,14 @@ export default defineConfig({
       registerType: 'autoUpdate',
       base: '/huan_huan/',
       scope: '/huan_huan/',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.png', 'apple-touch-icon.png', 'screenshot-home.png'],
       manifest: {
         name: '嬛嬛日記',
         short_name: '嬛嬛日記',
         description: '嬛嬛的生活記錄',
+        lang: 'zh-TW',
         theme_color: '#4AAFDC',
-        background_color: '#F2F9FC',
+        background_color: '#F5F0EB',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/huan_huan/',
@@ -27,6 +28,15 @@ export default defineConfig({
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+        screenshots: [
+          {
+            src: 'screenshot-home.png',
+            sizes: '390x844',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: '嬛嬛日記首頁',
+          },
         ],
       },
       workbox: {

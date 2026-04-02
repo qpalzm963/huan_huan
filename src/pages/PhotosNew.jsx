@@ -15,9 +15,26 @@ export default function PhotosNew() {
   const [file, setFile] = useState(null)
   const [preview, setPreview] = useState(null)
   const [form, setForm] = useState({ title: '', date: today, note: '' })
+  const [tags, setTags] = useState([])
+  const [tagInput, setTagInput] = useState('')
   const [progress, setProgress] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const PRESET_TAGS = ['玩耍', '睡覺', '吃飯', '日常', '可愛']
+
+  function addTag(t) {
+    const v = t.trim()
+    if (v && !tags.includes(v)) setTags(prev => [...prev, v])
+    setTagInput('')
+  }
+
+  function removeTag(t) { setTags(prev => prev.filter(x => x !== t)) }
+
+  function togglePreset(t) {
+    if (tags.includes(t)) removeTag(t)
+    else addTag(t)
+  }
 
   function set(field, value) {
     setForm(f => ({ ...f, [field]: value }))
@@ -55,6 +72,7 @@ export default function PhotosNew() {
         title: form.title.trim(),
         date: form.date,
         note: form.note.trim(),
+        tags,
         url,
         path,
         createdAt: Timestamp.now(),
@@ -111,6 +129,42 @@ export default function PhotosNew() {
           <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">備註（選填）</label>
           <textarea value={form.note} onChange={e => set('note', e.target.value)} placeholder="任何補充說明..." rows={2}
             className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC] resize-none" />
+        </div>
+
+        {/* 標籤 */}
+        <div>
+          <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">標籤（選填）</label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {PRESET_TAGS.map(t => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => togglePreset(t)}
+                className="px-3 py-1 rounded-full text-xs font-semibold border transition-colors"
+                style={tags.includes(t)
+                  ? { background: '#1A4F6E', color: '#fff', borderColor: '#1A4F6E' }
+                  : { background: 'white', color: '#7BAEC8', borderColor: '#B0D8EE' }}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2 min-h-[28px]">
+            {tags.filter(t => !PRESET_TAGS.includes(t)).map(t => (
+              <span key={t} className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#E8F4FC] text-[#1A4F6E] border border-[#B0D8EE]">
+                {t}
+                <button type="button" onClick={() => removeTag(t)} className="text-[#7BAEC8] hover:text-[#1A4F6E] leading-none">×</button>
+              </span>
+            ))}
+          </div>
+          <input
+            value={tagInput}
+            onChange={e => setTagInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(tagInput) } }}
+            onBlur={() => { if (tagInput.trim()) addTag(tagInput) }}
+            placeholder="輸入自訂標籤後按 Enter"
+            className="mt-2 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-2.5 text-sm text-[#1A4F6E] placeholder-[#B0D8EE] focus:outline-none focus:border-[#4AAFDC]"
+          />
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}

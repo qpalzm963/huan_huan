@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [recentExpenses, setRecentExpenses] = useState([])
   const [monthTotal, setMonthTotal] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [memoryPhotos, setMemoryPhotos] = useState([])
 
   useEffect(() => {
     async function load() {
@@ -39,6 +40,21 @@ export default function Dashboard() {
         const allSnap = await getDocs(query(collection(db, 'expenses'), orderBy('date', 'desc')))
         const total = allSnap.docs.map(d => d.data()).filter(d => d.date >= monthStart).reduce((s, d) => s + (d.amount || 0), 0)
         setMonthTotal(total)
+
+        // 記憶回顧：去年前後 3 天
+        const today = new Date()
+        const lastYear = today.getFullYear() - 1
+        const dates = []
+        for (let d = -3; d <= 3; d++) {
+          const dt = new Date(lastYear, today.getMonth(), today.getDate() + d)
+          dates.push(dt.toISOString().slice(0, 10))
+        }
+        const photosSnap = await getDocs(collection(db, 'photos'))
+        const memories = photosSnap.docs
+          .map(d => d.data())
+          .filter(p => dates.includes(p.date))
+          .slice(0, 3)
+        setMemoryPhotos(memories)
       } catch (e) { console.error(e) }
       finally { setLoading(false) }
     }
@@ -266,6 +282,46 @@ export default function Dashboard() {
       </div>
 
       <div className="divider-line" />
+
+      {/* 記憶回顧 */}
+      {memoryPhotos.length > 0 && (
+        <div
+          style={{ padding: '20px 24px', cursor: 'pointer' }}
+          onClick={() => navigate('/photos')}
+        >
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,235,210,0.7) 0%, rgba(200,232,247,0.6) 100%)',
+              borderRadius: 20,
+              padding: '16px',
+              border: '1px solid rgba(176,216,238,0.4)',
+              backdropFilter: 'blur(6px)',
+            }}
+          >
+            <div style={{ fontFamily: "'Caveat', cursive", fontSize: 20, fontWeight: 700, color: '#1A4F6E', marginBottom: 12 }}>
+              一年前的今天 🌿
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {memoryPhotos.map((p, i) => (
+                <div
+                  key={i}
+                  style={{
+                    flex: 1,
+                    aspectRatio: '1',
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                    background: '#E8F4FC',
+                  }}
+                >
+                  <img src={p.url} alt={p.title || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {memoryPhotos.length > 0 && <div className="divider-line" />}
 
       {/* Shortcuts */}
       <div style={{ padding: '20px 24px' }}>

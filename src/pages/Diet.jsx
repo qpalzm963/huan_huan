@@ -27,7 +27,7 @@ export default function Diet() {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 min-h-full" style={{ background: '#F5F0EB' }}>
       <div className="flex items-center justify-between mb-4">
         <h1 className="font-['Caveat'] text-2xl font-bold text-[#1A4F6E]">飲食日誌</h1>
         <button
