@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import * as exifr from 'exifr'
+import exifr from 'exifr'
 import { useNavigate } from 'react-router-dom'
 import { collection, addDoc, Timestamp } from 'firebase/firestore'
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
