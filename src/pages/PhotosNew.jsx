@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import * as exifr from 'exifr'
 import { useNavigate } from 'react-router-dom'
 import { collection, addDoc, Timestamp } from 'firebase/firestore'
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
@@ -20,6 +21,7 @@ export default function PhotosNew() {
   const [progress, setProgress] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [dateSource, setDateSource] = useState('manual') // 'exif' | 'manual'
 
   const PRESET_TAGS = ['玩耍', '睡覺', '吃飯', '日常', '可愛']
 
@@ -44,6 +46,22 @@ export default function PhotosNew() {
   async function handleFile(e) {
     const f = e.target.files[0]
     if (!f) return
+
+    // 嘗試讀取 EXIF 拍攝日期（在壓縮前，讀原始檔案）
+    try {
+      const exif = await exifr.parse(f, ['DateTimeOriginal', 'DateTime'])
+      const taken = exif?.DateTimeOriginal ?? exif?.DateTime
+      if (taken instanceof Date && !isNaN(taken)) {
+        const iso = taken.toISOString().split('T')[0]
+        set('date', iso)
+        setDateSource('exif')
+      } else {
+        setDateSource('manual')
+      }
+    } catch {
+      setDateSource('manual')
+    }
+
     const compressed = await compressImage(f, 1920, 0.85)
     setFile(compressed)
     setPreview(URL.createObjectURL(compressed))
@@ -120,8 +138,15 @@ export default function PhotosNew() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">日期</label>
-          <input type="date" value={form.date} onChange={e => set('date', e.target.value)}
+          <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide flex items-center gap-2">
+            日期
+            {dateSource === 'exif' && (
+              <span className="normal-case tracking-normal font-medium text-[10px] bg-[#E8F4FC] text-[#4AAFDC] px-2 py-0.5 rounded-full">
+                📷 自動填入
+              </span>
+            )}
+          </label>
+          <input type="date" value={form.date} onChange={e => { set('date', e.target.value); setDateSource('manual') }}
             className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]" />
         </div>
 
