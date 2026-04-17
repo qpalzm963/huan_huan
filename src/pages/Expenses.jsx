@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { collection, query, orderBy, getDocs, deleteDoc, doc } from 'firebase/firestore'
-import { db } from '../firebase'
+import { ref, deleteObject } from 'firebase/storage'
+import { db, storage } from '../firebase'
 import { Plus, Trash2 } from 'lucide-react'
 
 const CATEGORIES = { food: '食品', medical: '醫療', supplies: '用品', other: '其他' }
@@ -52,6 +53,10 @@ export default function Expenses() {
 
   async function handleDelete(id) {
     if (!confirm('確定要刪除？')) return
+    const exp = expenses.find(e => e.id === id)
+    if (exp?.photo?.path) {
+      deleteObject(ref(storage, exp.photo.path)).catch(() => {})
+    }
     await deleteDoc(doc(db, 'expenses', id))
     setExpenses(prev => prev.filter(e => e.id !== id))
   }
@@ -115,7 +120,13 @@ export default function Expenses() {
                 </div>
                 {items.map(exp => (
                   <div key={exp.id} className="ex-row">
-                    <div className="ex-dot" style={{ background: COLORS[exp.category] || '#7BAEC8' }} />
+                    {exp.photo?.url ? (
+                      <a href={exp.photo.url} target="_blank" rel="noreferrer" style={{ flexShrink: 0 }}>
+                        <img src={exp.photo.url} alt="" style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
+                      </a>
+                    ) : (
+                      <div className="ex-dot" style={{ background: COLORS[exp.category] || '#7BAEC8' }} />
+                    )}
                     <div className="ex-info">
                       <div className="ex-name">{exp.name}</div>
                       <div className="ex-sub">{CATEGORIES[exp.category]} · {exp.date?.slice(5)}</div>
