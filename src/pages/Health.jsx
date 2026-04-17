@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { collection, getDocs, orderBy, query, deleteDoc, doc } from 'firebase/firestore'
-import { db } from '../firebase'
+import { ref as storageRef, deleteObject } from 'firebase/storage'
+import { db, storage } from '../firebase'
 import { Plus, Trash2 } from 'lucide-react'
 
-const TABS = ['體重', '預防保健', '看診']
-const TABS_EMOJI = ['⚖️', '💊', '🏥']
+const TABS = ['體重', '預防保健', '看診', '異常狀態']
+const TABS_EMOJI = ['⚖️', '💊', '🏥', '🚨']
 const PREVENTIVE_TYPES = ['vaccine', 'deworming_internal', 'deworming_external']
 const PREVENTIVE_BADGE = {
   vaccine: { label: '疫苗', color: '#34D399' },
   deworming_internal: { label: '體內驅蟲', color: '#F59E0B' },
   deworming_external: { label: '體外驅蟲', color: '#C084FC' },
+}
+const SEVERITY_BADGE = {
+  mild: { label: '輕微', color: '#F59E0B' },
+  moderate: { label: '中等', color: '#F97316' },
+  severe: { label: '嚴重', color: '#EF4444' },
 }
 
 const S = `
@@ -39,6 +45,9 @@ const S = `
 .hl-empty { text-align: center; padding: 64px 0; }
 .hl-empty-icon { font-size: 48px; margin-bottom: 14px; }
 .hl-empty-text { font-size: 14px; color: #9BBDD0; margin-bottom: 22px; font-weight: 500; }
+.hl-anomaly-symptom { font-size: 14px; font-weight: 600; color: #1A4F6E; line-height: 1.4; }
+.hl-anomaly-photos { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+.hl-anomaly-photo { width: 58px; height: 58px; border-radius: 9px; object-fit: cover; border: 1px solid rgba(176,216,238,0.4); }
 .skel { background: linear-gradient(90deg, rgba(176,216,238,0.22) 25%, rgba(176,216,238,0.48) 50%, rgba(176,216,238,0.22) 75%); background-size: 200% 100%; animation: shimmer 1.35s infinite; border-radius: 18px; height: 68px; margin-bottom: 7px; }
 @keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
 .fade-in { animation: fadeUp 0.3s ease both; }
@@ -59,13 +68,19 @@ export default function Health() {
 
   async function handleDelete(id) {
     if (!confirm('確定要刪除？')) return
+    const record = records.find(r => r.id === id)
+    if (record?.type === 'anomaly' && record?.photos?.length > 0) {
+      await Promise.all(record.photos.map(p =>
+        deleteObject(storageRef(storage, p.path)).catch(() => {})
+      ))
+    }
     await deleteDoc(doc(db, 'health', id))
     setRecords(prev => prev.filter(r => r.id !== id))
   }
 
   const filtered = tab === 1
     ? records.filter(r => PREVENTIVE_TYPES.includes(r.type))
-    : records.filter(r => r.type === ['weight', null, 'visit'][tab])
+    : records.filter(r => r.type === ['weight', null, 'visit', 'anomaly'][tab])
 
   return (
     <div className="hl-page">
@@ -101,11 +116,37 @@ export default function Health() {
           {filtered.map(r => {
             const dotColor = r.type === 'weight' ? '#4AAFDC'
               : r.type === 'visit' ? '#F87171'
+              : r.type === 'anomaly' ? (r.severity === 'severe' ? '#EF4444' : r.severity === 'moderate' ? '#F97316' : '#F59E0B')
               : (PREVENTIVE_BADGE[r.type]?.color || '#9BBDD0')
             return (
               <div key={r.id} className="hl-card">
                 <div className="hl-dot" style={{ background: dotColor }} />
                 <div className="hl-body">
+                  {r.type === 'anomaly' && (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                        <span className="hl-anomaly-symptom">{r.symptom}</span>
+                        {r.severity && SEVERITY_BADGE[r.severity] && (
+                          <span
+                            className="hl-badge"
+                            style={{ background: SEVERITY_BADGE[r.severity].color + '22', color: SEVERITY_BADGE[r.severity].color }}
+                          >
+                            {SEVERITY_BADGE[r.severity].label}
+                          </span>
+                        )}
+                      </div>
+                      {r.photos?.length > 0 && (
+                        <div className="hl-anomaly-photos">
+                          {r.photos.map((p, i) => (
+                            <a key={i} href={p.url} target="_blank" rel="noreferrer">
+                              <img src={p.url} alt="" className="hl-anomaly-photo" />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                      <div className="hl-date">{r.date}{r.note ? ` · ${r.note}` : ''}</div>
+                    </>
+                  )}
                   {r.type === 'weight' && (
                     <>
                       <div className="hl-weight">{r.weight}<span className="hl-weight-unit">kg</span></div>
