@@ -95,6 +95,22 @@ export default function AvatarCropModal({ imageFile, onConfirm, onCancel, onRese
     if (e.touches.length < 2) pinchRef.current = null
   }
 
+  function produceBase64() {
+    const img = imgRef.current
+    if (!img) return null
+    const sWidth = STAGE_SIZE / scale
+    const sHeight = STAGE_SIZE / scale
+    const sx = (imgSize.w - sWidth) / 2 - offset.x / scale
+    const sy = (imgSize.h - sHeight) / 2 - offset.y / scale
+
+    const canvas = document.createElement('canvas')
+    canvas.width = 128
+    canvas.height = 128
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, 128, 128)
+    return canvas.toDataURL('image/webp', 0.85)
+  }
+
   return (
     <div
       style={{
@@ -161,7 +177,7 @@ export default function AvatarCropModal({ imageFile, onConfirm, onCancel, onRese
           取消
         </button>
         <button
-          onClick={() => onConfirm(null)}
+          onClick={() => onConfirm(produceBase64())}
           style={{ padding: '10px 24px', borderRadius: 100, border: 'none', background: '#4AAFDC', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
         >
           完成
