@@ -5,7 +5,7 @@ import { ref as storageRef, deleteObject } from 'firebase/storage'
 import { db, storage } from '../firebase'
 import { Plus, Trash2 } from 'lucide-react'
 
-const TABS = ['體重', '預防保健', '貓砂更換', '看診', '異常狀態']
+const TABS = ['體重', '保健', '貓砂', '醫療', '異常']
 const TABS_EMOJI = ['⚖️', '💊', '🧹', '🏥', '🚨']
 const PREVENTIVE_TYPES = ['vaccine', 'deworming_internal', 'deworming_external']
 const PREVENTIVE_BADGE = {
