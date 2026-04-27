@@ -12,6 +12,8 @@ const TYPES = [
   { value: 'vaccine', label: '疫苗' },
   { value: 'deworming_internal', label: '體內驅蟲' },
   { value: 'deworming_external', label: '體外驅蟲' },
+  { value: 'litter_large', label: '大貓砂盆' },
+  { value: 'litter_small', label: '小貓砂盆' },
   { value: 'visit', label: '看診' },
   { value: 'anomaly', label: '異常狀態' },
 ]
@@ -31,6 +33,7 @@ export default function HealthNew() {
 
   const [type, setType] = useState('weight')
   const isPreventive = ['vaccine', 'deworming_internal', 'deworming_external'].includes(type)
+  const isLitter = ['litter_large', 'litter_small'].includes(type)
   const [form, setForm] = useState({
     date: today, weight: '', name: '', nextDate: '',
     clinic: '', reason: '', symptom: '', severity: '', note: ''
@@ -95,6 +98,7 @@ export default function HealthNew() {
       const data = { type, date: form.date, note: form.note.trim(), createdAt: Timestamp.now() }
       if (type === 'weight') data.weight = Number(form.weight)
       if (isPreventive) { data.name = form.name.trim(); data.nextDate = form.nextDate }
+      if (isLitter) data.nextDate = form.nextDate
       if (type === 'visit') { data.clinic = form.clinic.trim(); data.reason = form.reason.trim() }
       if (type === 'anomaly') {
         data.symptom = form.symptom.trim()
@@ -160,6 +164,15 @@ export default function HealthNew() {
               className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]" />
           </div>
         </>)}
+
+        {/* 貓砂更換 */}
+        {isLitter && (
+          <div>
+            <label className="text-xs font-semibold text-[#7BAEC8] uppercase tracking-wide">下次更換日（選填）</label>
+            <input type="date" value={form.nextDate} onChange={e => set('nextDate', e.target.value)}
+              className="mt-1 w-full bg-white border border-[#B0D8EE] rounded-xl px-4 py-3 text-sm text-[#1A4F6E] focus:outline-none focus:border-[#4AAFDC]" />
+          </div>
+        )}
 
         {/* 看診 */}
         {type === 'visit' && (<>

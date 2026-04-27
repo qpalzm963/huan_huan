@@ -5,13 +5,18 @@ import { ref as storageRef, deleteObject } from 'firebase/storage'
 import { db, storage } from '../firebase'
 import { Plus, Trash2 } from 'lucide-react'
 
-const TABS = ['體重', '預防保健', '看診', '異常狀態']
-const TABS_EMOJI = ['⚖️', '💊', '🏥', '🚨']
+const TABS = ['體重', '預防保健', '貓砂更換', '看診', '異常狀態']
+const TABS_EMOJI = ['⚖️', '💊', '🧹', '🏥', '🚨']
 const PREVENTIVE_TYPES = ['vaccine', 'deworming_internal', 'deworming_external']
 const PREVENTIVE_BADGE = {
   vaccine: { label: '疫苗', color: '#34D399' },
   deworming_internal: { label: '體內驅蟲', color: '#F59E0B' },
   deworming_external: { label: '體外驅蟲', color: '#C084FC' },
+}
+const LITTER_TYPES = ['litter_large', 'litter_small']
+const LITTER_BADGE = {
+  litter_large: { label: '大貓砂盆', color: '#8B6F47' },
+  litter_small: { label: '小貓砂盆', color: '#D4A574' },
 }
 const SEVERITY_BADGE = {
   mild: { label: '輕微', color: '#F59E0B' },
@@ -80,7 +85,9 @@ export default function Health() {
 
   const filtered = tab === 1
     ? records.filter(r => PREVENTIVE_TYPES.includes(r.type))
-    : records.filter(r => r.type === ['weight', null, 'visit', 'anomaly'][tab])
+    : tab === 2
+    ? records.filter(r => LITTER_TYPES.includes(r.type))
+    : records.filter(r => r.type === ['weight', null, null, 'visit', 'anomaly'][tab])
 
   return (
     <div className="hl-page">
@@ -117,6 +124,7 @@ export default function Health() {
             const dotColor = r.type === 'weight' ? '#4AAFDC'
               : r.type === 'visit' ? '#F87171'
               : r.type === 'anomaly' ? (r.severity === 'severe' ? '#EF4444' : r.severity === 'moderate' ? '#F97316' : '#F59E0B')
+              : LITTER_TYPES.includes(r.type) ? (LITTER_BADGE[r.type]?.color || '#9BBDD0')
               : (PREVENTIVE_BADGE[r.type]?.color || '#9BBDD0')
             return (
               <div key={r.id} className="hl-card">
@@ -167,6 +175,25 @@ export default function Health() {
                       </div>
                       {r.nextDate && (
                         <div className="hl-next" style={{ color: PREVENTIVE_BADGE[r.type]?.color }}>
+                          下次：{r.nextDate}
+                        </div>
+                      )}
+                      <div className="hl-date">{r.date}{r.note ? ` · ${r.note}` : ''}</div>
+                    </>
+                  )}
+                  {LITTER_TYPES.includes(r.type) && (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <span className="hl-name">更換{LITTER_BADGE[r.type]?.label}</span>
+                        <span
+                          className="hl-badge"
+                          style={{ background: (LITTER_BADGE[r.type]?.color || '#9BBDD0') + '22', color: LITTER_BADGE[r.type]?.color }}
+                        >
+                          {LITTER_BADGE[r.type]?.label}
+                        </span>
+                      </div>
+                      {r.nextDate && (
+                        <div className="hl-next" style={{ color: LITTER_BADGE[r.type]?.color }}>
                           下次：{r.nextDate}
                         </div>
                       )}
