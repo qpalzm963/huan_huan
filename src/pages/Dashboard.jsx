@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
+import AvatarCropModal from '../components/AvatarCropModal'
+import { getProfile, saveAvatar } from '../utils/profileSettings'
 
 const EXPENSE_CATEGORIES = { food: '食品', medical: '醫療', supplies: '用品', other: '其他' }
 const CAT_CATEGORY_COLORS = { food: '#5BB8E8', medical: '#F87171', supplies: '#34D399', other: '#C084FC' }
@@ -27,6 +29,9 @@ export default function Dashboard() {
   const [monthTotal, setMonthTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [memoryPhotos, setMemoryPhotos] = useState([])
+  const [avatarBase64, setAvatarBase64] = useState(null)
+  const [cropFile, setCropFile] = useState(null)
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     async function load() {
@@ -55,11 +60,53 @@ export default function Dashboard() {
           .filter(p => dates.includes(p.date))
           .slice(0, 3)
         setMemoryPhotos(memories)
+
+        const profile = await getProfile()
+        setAvatarBase64(profile.avatarBase64)
       } catch (e) { console.error(e) }
       finally { setLoading(false) }
     }
     load()
   }, [])
+
+  function openPicker() {
+    fileInputRef.current?.click()
+  }
+
+  function onFileChosen(e) {
+    const file = e.target.files?.[0]
+    if (file) setCropFile(file)
+    e.target.value = ''
+  }
+
+  async function handleConfirm(base64) {
+    if (!base64) { setCropFile(null); return }
+    try {
+      await saveAvatar(base64)
+      setAvatarBase64(base64)
+    } catch (err) {
+      console.error('saveAvatar failed', err)
+      alert('儲存失敗，請重試')
+      return
+    }
+    setCropFile(null)
+  }
+
+  async function handleReset() {
+    try {
+      await saveAvatar(null)
+      setAvatarBase64(null)
+    } catch (err) {
+      console.error('saveAvatar(null) failed', err)
+      alert('還原失敗，請重試')
+      return
+    }
+    setCropFile(null)
+  }
+
+  function handleCancel() {
+    setCropFile(null)
+  }
 
   const now = new Date()
   const monthLabel = `${now.getMonth() + 1}月`
@@ -249,7 +296,18 @@ export default function Dashboard() {
         <div className="dash-blob-2" />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
-          <div className="cat-avatar">🐱</div>
+          <div className="cat-avatar" onClick={openPicker} style={{ cursor: 'pointer', overflow: 'hidden' }}>
+            {avatarBase64
+              ? <img src={avatarBase64} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : '🐱'}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={onFileChosen}
+            style={{ display: 'none' }}
+          />
           <div>
             <div className="hero-name">嬛嬛</div>
             <div style={{ fontSize: 12, color: '#7BAEC8', fontWeight: 500, marginTop: 2 }}>的日記本</div>
@@ -384,6 +442,15 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {cropFile && (
+        <AvatarCropModal
+          imageFile={cropFile}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+          onReset={handleReset}
+        />
+      )}
     </div>
   )
 }
