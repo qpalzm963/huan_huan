@@ -11,79 +11,84 @@ const LOCAL_ICONS = {
   '貓有話說': '/huan_huan/brand-icons/maohuashuo.png',
 }
 
+const STAR_FILL = 'oklch(0.78 0.06 25)'
+const STAR_EMPTY = '#D8C8C8'
+
 function BrandAvatar({ brand, size = 'sm' }) {
   const icon = brand.iconUrl || LOCAL_ICONS[brand.name]
   const sm = size === 'sm'
   const style = {
-    width: sm ? 40 : 56,
-    height: sm ? 40 : 56,
-    borderRadius: 12,
+    width: sm ? 44 : 60,
+    height: sm ? 44 : 60,
+    borderRadius: 14,
     flexShrink: 0,
     objectFit: 'contain',
-    background: '#fff',
-    border: '1px solid rgba(176,216,238,0.5)',
+    background: '#FBF6F1',
+    border: '1px solid #EFE3D6',
   }
   if (icon) return <img src={icon} alt={brand.name} style={style} />
   return (
     <div style={{
       ...style,
-      background: '#4AAFDC',
+      background: '#3A2E2E',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      color: '#fff',
-      fontWeight: 700,
-      fontSize: sm ? 14 : 20,
+      color: '#FBF6F1',
+      fontFamily: 'Quicksand',
+      fontWeight: 500,
+      fontSize: sm ? 16 : 22,
     }}>
       {brand.name?.[0] || '?'}
     </div>
   )
 }
 
-export { BrandAvatar, LOCAL_ICONS }
+export { BrandAvatar, LOCAL_ICONS, STAR_FILL, STAR_EMPTY }
 
 const S = `
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap');
-.br-page { background: #F5F0EB; min-height: 100%; padding: 20px 20px 48px; }
-.br-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.br-title { font-family: 'Caveat', cursive; font-size: 34px; font-weight: 700; color: #1A4F6E; line-height: 1; }
-.br-add { display: flex; align-items: center; gap: 5px; background: #1A4F6E; color: #fff; font-size: 13px; font-weight: 700; padding: 9px 18px; border-radius: 100px; border: none; cursor: pointer; }
-.br-add:active { opacity: 0.8; transform: scale(0.97); }
-.br-card { display: flex; align-items: center; gap: 12px; padding: 13px 15px; background: rgba(255,255,255,0.76); border-radius: 18px; margin-bottom: 7px; border: 1px solid rgba(176,216,238,0.4); backdrop-filter: blur(5px); cursor: pointer; transition: background 0.15s; }
-.br-card:active { background: rgba(255,255,255,0.9); }
-.br-name { font-size: 14px; font-weight: 600; color: #1A4F6E; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.br-count { font-size: 11px; color: #9BBDD0; margin-top: 2px; }
-.br-stars { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }
-.br-del { color: #C8DDE8; background: none; border: none; cursor: pointer; padding: 5px; flex-shrink: 0; transition: color 0.15s; }
-.br-del:active { color: #F87171; }
-.br-chevron { color: #C8DDE8; flex-shrink: 0; }
-.br-empty { text-align: center; padding: 64px 0; }
-.br-empty-icon { font-size: 48px; margin-bottom: 14px; }
-.br-empty-text { font-size: 14px; color: #9BBDD0; margin-bottom: 22px; font-weight: 500; }
-.skel { background: linear-gradient(90deg, rgba(176,216,238,0.22) 25%, rgba(176,216,238,0.48) 50%, rgba(176,216,238,0.22) 75%); background-size: 200% 100%; animation: shimmer 1.35s infinite; border-radius: 18px; height: 68px; margin-bottom: 7px; }
+.br-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #FFFFFF; border-radius: 20px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(58,46,46,0.05); cursor: pointer; transition: transform 0.15s; }
+.br-card:active { transform: scale(0.99); }
+.br-name { font-family: 'Quicksand'; font-size: 15px; font-weight: 500; color: #3A2E2E; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.br-count { font-family: 'JetBrains Mono'; font-size: 10px; color: #B5A3A3; margin-top: 3px; letter-spacing: 0.08em; }
+.br-stars { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.br-icon-btn { color: #D8C8C8; background: none; border: none; cursor: pointer; padding: 5px; flex-shrink: 0; transition: color 0.15s; }
+.br-icon-btn:active { color: oklch(0.78 0.06 25); }
+.br-empty { text-align: center; padding: 64px 16px; }
+.br-empty-icon { font-size: 44px; margin-bottom: 14px; }
+.br-empty-title { font-family: 'Quicksand'; font-size: 18px; color: #6E5A5A; margin-bottom: 8px; }
+.br-empty-desc { font-family: 'Nunito'; font-size: 12px; color: #B5A3A3; margin-bottom: 22px; line-height: 1.5; }
+.skel { background: linear-gradient(90deg, rgba(58,46,46,0.04) 25%, rgba(58,46,46,0.08) 50%, rgba(58,46,46,0.04) 75%); background-size: 200% 100%; animation: shimmer 1.35s infinite; border-radius: 20px; height: 76px; margin-bottom: 8px; }
 @keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
 .fade-in { animation: fadeUp 0.32s ease both; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Bottom Sheet */
 .bs-overlay { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; justify-content: flex-end; }
-.bs-bg { position: absolute; inset: 0; background: rgba(15,20,30,0.45); }
-.bs-panel { position: relative; background: #FAF8F5; border-radius: 28px 28px 0 0; padding: 8px 20px 32px; }
-.bs-handle { width: 36px; height: 4px; background: rgba(176,216,238,0.6); border-radius: 100px; margin: 10px auto 18px; }
-.bs-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.bs-header-title { font-family: 'Caveat', cursive; font-size: 20px; font-weight: 700; color: #1A4F6E; }
-.bs-close { background: rgba(176,216,238,0.25); border: none; border-radius: 10px; padding: 6px; cursor: pointer; color: #7BAEC8; display: flex; }
-.bs-close:active { background: rgba(176,216,238,0.5); }
-.bs-btn { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.8); border-radius: 18px; padding: 14px 16px; border: 1px solid rgba(176,216,238,0.35); cursor: pointer; width: 100%; margin-bottom: 8px; text-align: left; transition: background 0.15s; }
-.bs-btn:active { background: rgba(255,255,255,1); }
+.bs-bg { position: absolute; inset: 0; background: rgba(58,46,46,0.45); }
+.bs-panel { position: relative; background: #FBF6F1; border-radius: 28px 28px 0 0; padding: 8px 20px 32px; }
+.bs-handle { width: 36px; height: 4px; background: #D8C8C8; border-radius: 100px; margin: 10px auto 18px; }
+.bs-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.bs-header-title { font-family: 'Quicksand'; font-size: 20px; font-weight: 500; color: #3A2E2E; }
+.bs-close { background: rgba(58,46,46,0.06); border: none; border-radius: 12px; padding: 6px; cursor: pointer; color: #6E5A5A; display: flex; }
+.bs-close:active { background: rgba(58,46,46,0.12); }
+.bs-btn { display: flex; align-items: center; gap: 14px; background: #FFFFFF; border-radius: 18px; padding: 14px 16px; border: none; box-shadow: 0 2px 8px rgba(58,46,46,0.04); cursor: pointer; width: 100%; margin-bottom: 8px; text-align: left; transition: transform 0.15s; }
+.bs-btn:active { transform: scale(0.99); }
 .bs-btn-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.bs-btn-title { font-size: 14px; font-weight: 600; color: #1A4F6E; }
-.bs-btn-sub { font-size: 11px; color: #9BBDD0; margin-top: 1px; }
-.bs-pick { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.8); border-radius: 16px; padding: 12px 14px; border: 1px solid rgba(176,216,238,0.35); cursor: pointer; width: 100%; margin-bottom: 6px; text-align: left; }
-.bs-pick:active { background: rgba(255,255,255,1); }
-.bs-pick-name { font-size: 14px; font-weight: 600; color: #1A4F6E; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bs-btn-title { font-family: 'Quicksand'; font-size: 15px; font-weight: 500; color: #3A2E2E; }
+.bs-btn-sub { font-family: 'Nunito'; font-size: 11px; color: #B5A3A3; margin-top: 2px; }
+.bs-pick { display: flex; align-items: center; gap: 12px; background: #FFFFFF; border-radius: 16px; padding: 12px 14px; border: none; box-shadow: 0 2px 8px rgba(58,46,46,0.04); cursor: pointer; width: 100%; margin-bottom: 6px; text-align: left; }
+.bs-pick:active { transform: scale(0.99); }
+.bs-pick-name { font-family: 'Quicksand'; font-size: 15px; font-weight: 500; color: #3A2E2E; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bs-pick-scroll { max-height: 280px; overflow-y: auto; }
 `
+
+const addBtnStyle = {
+  background: '#3A2E2E', color: '#FBF6F1', border: 'none',
+  padding: '8px 14px', borderRadius: 999,
+  fontFamily: 'Nunito', fontWeight: 600, fontSize: 12,
+  display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer',
+}
 
 export default function Brands() {
   const navigate = useNavigate()
@@ -117,13 +122,18 @@ export default function Brands() {
   }
 
   return (
-    <div className="br-page">
+    <div style={{ padding: '8px 16px 16px' }}>
       <style>{S}</style>
 
-      <div className="br-top">
-        <div className="br-title">品牌管理</div>
-        <button className="br-add" onClick={() => setSheet('choice')}>
-          <Plus size={14} /> 新增
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 6px 14px' }}>
+        <div>
+          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, letterSpacing: '0.15em', color: '#B5A3A3' }}>SECTION · 牌</div>
+          <div style={{ fontFamily: 'Quicksand', fontSize: 26, color: '#3A2E2E', letterSpacing: '-0.01em', marginTop: 2 }}>
+            <span>品牌</span> 管理
+          </div>
+        </div>
+        <button style={addBtnStyle} onClick={() => setSheet('choice')}>
+          <Plus size={13} /> 新增
         </button>
       </div>
 
@@ -132,9 +142,10 @@ export default function Brands() {
       ) : brands.length === 0 ? (
         <div className="br-empty">
           <div className="br-empty-icon">🏷️</div>
-          <div className="br-empty-text">還沒有品牌紀錄<br />記錄嬛嬛喜歡的品牌</div>
-          <button className="br-add" style={{ margin: '0 auto' }} onClick={() => navigate('/brands/new')}>
-            <Plus size={14} /> 新增品牌
+          <div className="br-empty-title">還沒有品牌紀錄</div>
+          <div className="br-empty-desc">記錄嬛嬛喜歡的品牌</div>
+          <button style={{ ...addBtnStyle, margin: '0 auto' }} onClick={() => navigate('/brands/new')}>
+            <Plus size={13} /> 新增品牌
           </button>
         </div>
       ) : (
@@ -151,14 +162,14 @@ export default function Brands() {
               <div className="br-stars">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star key={i} size={12}
-                    style={{ fill: i < (brand.rating || 0) ? '#4AAFDC' : 'none', color: i < (brand.rating || 0) ? '#4AAFDC' : '#B0D8EE' }}
+                    style={{ fill: i < (brand.rating || 0) ? STAR_FILL : 'none', color: i < (brand.rating || 0) ? STAR_FILL : STAR_EMPTY }}
                   />
                 ))}
               </div>
-              <button className="br-del" onClick={e => handleDelete(e, brand.id)}>
+              <button className="br-icon-btn" onClick={e => handleDelete(e, brand.id)}>
                 <Trash2 size={15} />
               </button>
-              <ChevronRight size={15} className="br-chevron" />
+              <ChevronRight size={15} style={{ color: '#D8C8C8', flexShrink: 0 }} />
             </div>
           ))}
         </div>
@@ -181,8 +192,8 @@ export default function Brands() {
             {sheet === 'choice' && (
               <>
                 <button className="bs-btn" onClick={() => { setSheet(null); navigate('/brands/new') }}>
-                  <div className="bs-btn-icon" style={{ background: 'rgba(26,79,110,0.12)' }}>
-                    <Tag size={18} color="#1A4F6E" />
+                  <div className="bs-btn-icon" style={{ background: 'oklch(0.78 0.06 25 / 0.18)' }}>
+                    <Tag size={18} color="oklch(0.55 0.08 25)" />
                   </div>
                   <div>
                     <div className="bs-btn-title">新增品牌</div>
@@ -190,8 +201,8 @@ export default function Brands() {
                   </div>
                 </button>
                 <button className="bs-btn" onClick={() => brands.length > 0 ? setSheet('pick-brand') : navigate('/brands/new')}>
-                  <div className="bs-btn-icon" style={{ background: 'rgba(52,211,153,0.15)' }}>
-                    <Package size={18} color="#34D399" />
+                  <div className="bs-btn-icon" style={{ background: 'oklch(0.82 0.05 145 / 0.22)' }}>
+                    <Package size={18} color="oklch(0.45 0.07 145)" />
                   </div>
                   <div>
                     <div className="bs-btn-title">新增產品</div>
@@ -207,7 +218,7 @@ export default function Brands() {
                   <button key={brand.id} className="bs-pick" onClick={() => { setSheet(null); navigate(`/brands/${brand.id}/products/new`) }}>
                     <BrandAvatar brand={brand} size="sm" />
                     <span className="bs-pick-name">{brand.name}</span>
-                    <ChevronRight size={15} color="#B0D8EE" />
+                    <ChevronRight size={15} color="#D8C8C8" />
                   </button>
                 ))}
               </div>
