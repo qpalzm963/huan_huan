@@ -9,6 +9,10 @@ const LOCAL_ICONS = {
   '毛掌醫學': '/huan_huan/brand-icons/maozhuang.png',
   '肉球世界': '/huan_huan/brand-icons/rouqiu.png',
   '貓有話說': '/huan_huan/brand-icons/maohuashuo.png',
+  'EARTH大地': '/huan_huan/brand-icons/dadi.png',
+  '汪喵星球': '/huan_huan/brand-icons/wangmiao.png',
+  '奇境': '/huan_huan/brand-icons/qijing.png',
+  '飛帕特': '/huan_huan/brand-icons/fampet.png',
 }
 
 // Rotation of fallback colors (for branded chip when no icon)
