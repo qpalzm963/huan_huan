@@ -1,18 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #FBF6F1;
+  --color-bg: #FFF9F2;
+  --color-bg-warm: #FFEFE0;
   --color-card: #FFFFFF;
-  --color-ink: #3A2E2E;
-  --color-ink-soft: #6E5A5A;
-  --color-ink-mute: #B5A3A3;
-  --color-accent: oklch(0.88 0.05 15);
-  --color-accent-2: oklch(0.78 0.06 25);
-  --color-rule: #F0E4E0;
-  --color-glow: oklch(0.94 0.04 20);
+  --color-ink: #3D2A2A;
+  --color-ink-soft: #7A5C5C;
+  --color-ink-mute: #C4A8A8;
+  --color-pink: #FFC8D6;
+  --color-pink-deep: #FF92AE;
+  --color-peach: #FFD4B0;
+  --color-peach-deep: #FFA877;
+  --color-mint: #C8EBD9;
+  --color-mint-deep: #7FCCA6;
+  --color-butter: #FFE4A0;
+  --color-butter-deep: #F5C04D;
+  --color-lilac: #E0CFF2;
+  --color-lilac-deep: #B594D9;
+  --color-sky: #C8E0F2;
+  --color-sky-deep: #7FB3DB;
+  --color-rule: #F5E6E0;
 
-  --font-display: 'Quicksand', 'Nunito', system-ui, sans-serif;
-  --font-sans: 'Nunito', 'Quicksand', system-ui, sans-serif;
+  --font-display: 'Fredoka', 'M PLUS Rounded 1c', 'Noto Sans TC', system-ui, sans-serif;
+  --font-sans: 'Nunito', 'M PLUS Rounded 1c', 'Noto Sans TC', system-ui, sans-serif;
+  --font-hand: 'Caveat', 'M PLUS Rounded 1c', 'Noto Sans TC', cursive;
   --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
 }
 
@@ -20,17 +31,18 @@
 
 body {
   margin: 0;
-  font-family: 'Nunito', system-ui, sans-serif;
-  background-color: #FBF6F1;
-  color: #3A2E2E;
+  font-family: 'Nunito', 'M PLUS Rounded 1c', 'Noto Sans TC', system-ui, sans-serif;
+  background-color: #FFF9F2;
+  color: #3D2A2A;
   -webkit-font-smoothing: antialiased;
 }
 
-#root {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-}
+#root { min-height: 100dvh; display: flex; flex-direction: column; }
 
-.font-display { font-family: 'Quicksand', 'Nunito', system-ui, sans-serif; font-weight: 600; }
+.font-display { font-family: 'Fredoka', 'M PLUS Rounded 1c', 'Noto Sans TC', system-ui, sans-serif; font-weight: 600; }
+.font-hand { font-family: 'Caveat', 'M PLUS Rounded 1c', 'Noto Sans TC', cursive; font-weight: 600; }
 .font-mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; }
+
+/* Sticker card — chunky black border + offset shadow */
+.sticker { border: 2px solid #3D2A2A; box-shadow: 0 4px 0 #3D2A2A; border-radius: 22px; background: #fff; }
+.sticker-sm { border: 2px solid #3D2A2A; box-shadow: 0 2px 0 #3D2A2A; border-radius: 16px; background: #fff; }

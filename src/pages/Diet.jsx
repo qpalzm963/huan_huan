@@ -23,26 +23,27 @@ export default function Diet() {
   }
 
   return (
-    <div style={{ padding: '8px 16px 16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 6px 14px' }}>
+    <div style={{ padding: '4px 14px 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 4px 14px' }}>
         <div>
-          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, letterSpacing: '0.15em', color: '#B5A3A3' }}>SECTION · 食</div>
-          <div style={{ fontFamily: 'Quicksand', fontSize: 26, color: '#3A2E2E', letterSpacing: '-0.01em', marginTop: 2 }}>
-            <span style={{ }}>飲食</span> 日誌
+          <div style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: '#FF92AE', fontWeight: 600 }}>diet log ♡</div>
+          <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 26, fontWeight: 600, color: '#3D2A2A', letterSpacing: '-0.01em', marginTop: 2 }}>
+            飲食日誌
           </div>
         </div>
         <button onClick={() => navigate('/diet/new')} style={{
-          background: '#3A2E2E', color: '#FBF6F1', border: 'none',
+          background: '#3D2A2A', color: '#FFFFFF', border: '2px solid #3D2A2A',
           padding: '8px 14px', borderRadius: 999,
-          fontFamily: 'Nunito', fontWeight: 600, fontSize: 12,
+          fontFamily: "'Fredoka', system-ui", fontWeight: 700, fontSize: 12,
           display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer',
+          boxShadow: '0 3px 0 #7FCCA6',
         }}>
           <Plus size={13} /> 新增
         </button>
       </div>
 
       {loading ? (
-        <div>{[1,2,3].map(i => <div key={i} style={{ height: 80, background: '#FFFFFF', borderRadius: 22, marginBottom: 8, opacity: 0.6 }} />)}</div>
+        <div>{[1,2,3].map(i => <div key={i} style={{ height: 80, background: '#FFFFFF', border: '2px solid #F0E4E0', borderRadius: 18, marginBottom: 8, opacity: 0.6 }} />)}</div>
       ) : records.length === 0 ? (
         <EmptyState
           icon="🍽️"
@@ -50,8 +51,9 @@ export default function Diet() {
           description="記錄嬛嬛今天吃了什麼"
           action={
             <button onClick={() => navigate('/diet/new')} style={{
-              background: '#3A2E2E', color: '#FBF6F1', border: 'none',
-              padding: '10px 20px', borderRadius: 999, fontFamily: 'Nunito', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              background: '#3D2A2A', color: '#FFFFFF', border: '2px solid #3D2A2A',
+              padding: '10px 20px', borderRadius: 999, fontFamily: "'Fredoka', system-ui", fontSize: 13, fontWeight: 700, cursor: 'pointer',
+              boxShadow: '0 3px 0 #7FCCA6',
             }}>新增紀錄</button>
           }
         />
@@ -61,37 +63,38 @@ export default function Diet() {
             const [y, mo, d] = (r.date || '').split('-')
             return (
               <div key={r.id} style={{
-                background: '#FFFFFF', borderRadius: 22, padding: 16, marginBottom: 8,
-                display: 'grid', gridTemplateColumns: '52px 1fr auto', gap: 14,
-                boxShadow: '0 2px 8px rgba(58,46,46,0.05)',
+                background: '#FFFFFF', borderRadius: 18, padding: 12, marginBottom: 8,
+                border: '2px solid #3D2A2A', boxShadow: '0 2px 0 #3D2A2A',
+                display: 'grid', gridTemplateColumns: '46px 1fr auto', gap: 12,
               }}>
                 <div style={{
-                  background: '#FBF6F1', borderRadius: 14, padding: '8px 0',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  background: '#FFE4A0', borderRadius: 14, padding: '6px 0',
+                  border: '1.5px solid #3D2A2A',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <div style={{ fontFamily: 'Quicksand', fontSize: 24, lineHeight: 1, color: '#3A2E2E' }}>{d || '—'}</div>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 8, letterSpacing: '0.15em', color: '#B5A3A3', marginTop: 2 }}>{mo ? `${parseInt(mo)}月` : ''}</div>
+                  <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 22, lineHeight: 1, fontWeight: 700, color: '#3D2A2A' }}>{d || '—'}</div>
+                  <div style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 8, letterSpacing: '0.1em', color: '#7A5C5C', marginTop: 2 }}>{mo ? `${parseInt(mo)}月` : ''}</div>
                 </div>
                 <div>
                   {r.morning && (
                     <div style={{ display: 'grid', gridTemplateColumns: '24px 1fr auto', gap: 8, alignItems: 'baseline' }}>
-                      <span style={{ fontFamily: 'Quicksand', fontSize: 13, color: '#B5A3A3' }}>AM</span>
-                      <span style={{ fontFamily: 'Nunito', fontSize: 14, fontWeight: 500, color: '#3A2E2E' }}>{r.morning}</span>
-                      {r.morningAmount && <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: '#6E5A5A' }}>{r.morningAmount}g</span>}
+                      <span style={{ fontFamily: "'Caveat', cursive", fontSize: 14, fontWeight: 600, color: '#FFA877' }}>AM</span>
+                      <span style={{ fontFamily: "'Fredoka', system-ui", fontSize: 13, fontWeight: 600, color: '#3D2A2A' }}>{r.morning}</span>
+                      {r.morningAmount && <span style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 11, color: '#7A5C5C' }}>{r.morningAmount}g</span>}
                     </div>
                   )}
                   {r.evening && (
-                    <div style={{ display: 'grid', gridTemplateColumns: '24px 1fr auto', gap: 8, alignItems: 'baseline', marginTop: 4 }}>
-                      <span style={{ fontFamily: 'Quicksand', fontSize: 13, color: '#B5A3A3' }}>PM</span>
-                      <span style={{ fontFamily: 'Nunito', fontSize: 14, fontWeight: 500, color: '#3A2E2E' }}>{r.evening}</span>
-                      {r.eveningAmount && <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: '#6E5A5A' }}>{r.eveningAmount}g</span>}
+                    <div style={{ display: 'grid', gridTemplateColumns: '24px 1fr auto', gap: 8, alignItems: 'baseline', marginTop: 3 }}>
+                      <span style={{ fontFamily: "'Caveat', cursive", fontSize: 14, fontWeight: 600, color: '#B594D9' }}>PM</span>
+                      <span style={{ fontFamily: "'Fredoka', system-ui", fontSize: 13, fontWeight: 600, color: '#3D2A2A' }}>{r.evening}</span>
+                      {r.eveningAmount && <span style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 11, color: '#7A5C5C' }}>{r.eveningAmount}g</span>}
                     </div>
                   )}
                   {r.note && (
-                    <div style={{ fontFamily: 'Quicksand', fontSize: 12, color: '#6E5A5A', marginTop: 8 }}>“{r.note}”</div>
+                    <div style={{ fontFamily: "'Caveat', cursive", fontSize: 14, color: '#7A5C5C', fontWeight: 500, marginTop: 4 }}>♡ {r.note}</div>
                   )}
                 </div>
-                <button onClick={() => handleDelete(r.id)} style={{ background: 'none', border: 'none', color: '#D8C8C8', cursor: 'pointer', padding: 4, alignSelf: 'flex-start' }}>
+                <button onClick={() => handleDelete(r.id)} style={{ background: 'none', border: 'none', color: '#C4A8A8', cursor: 'pointer', padding: 4, alignSelf: 'flex-start' }}>
                   <Trash2 size={14} />
                 </button>
               </div>

@@ -6,17 +6,23 @@ export default function PageHeader({ title, action }) {
   return (
     <header
       className="sticky top-0 z-10 px-5 py-3 flex items-center justify-between"
-      style={{ background: 'rgba(251,246,241,0.85)', backdropFilter: 'blur(12px)' }}
+      style={{ background: 'rgba(255,249,242,0.9)', backdropFilter: 'blur(12px)' }}
     >
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-1 text-sm font-medium cursor-pointer"
-        style={{ color: '#6E5A5A', background: 'transparent', border: 'none' }}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 4,
+          background: '#FFFFFF', border: '2px solid #3D2A2A', borderRadius: 999,
+          padding: '5px 12px',
+          fontFamily: "'Fredoka', system-ui", fontSize: 12, fontWeight: 600,
+          color: '#3D2A2A', cursor: 'pointer',
+          boxShadow: '0 2px 0 #3D2A2A',
+        }}
       >
-        <ArrowLeft size={16} />
+        <ArrowLeft size={14} />
         返回
       </button>
-      <span className="font-display text-lg" style={{ color: '#3A2E2E', fontWeight: 500 }}>{title}</span>
+      <span style={{ fontFamily: "'Fredoka', system-ui", fontSize: 18, fontWeight: 600, color: '#3D2A2A' }}>{title}</span>
       <div className="w-16 flex justify-end">{action}</div>
     </header>
   )

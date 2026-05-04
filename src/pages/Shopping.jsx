@@ -2,56 +2,22 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { collection, query, orderBy, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore'
 import { db } from '../firebase'
-import { Plus, Trash2, CheckCircle2, Circle, ChevronRight, ArrowRight } from 'lucide-react'
+import { Plus, Trash2, ArrowRight } from 'lucide-react'
 
 const CATEGORIES = { food: '食品', medical: '醫療', supplies: '用品', other: '其他' }
 const CAT_COLORS = {
-  food: 'oklch(0.78 0.06 25)',
-  medical: 'oklch(0.78 0.06 25)',
-  supplies: 'oklch(0.78 0.05 75)',
-  other: '#B5A3A3',
+  food:     '#FFD4B0',
+  medical:  '#C8EBD9',
+  supplies: '#E0CFF2',
+  other:    '#C8E0F2',
 }
 
-const S = `
-.sh-stats { display: flex; gap: 8px; margin-bottom: 16px; }
-.sh-stat { flex: 1; background: #FFFFFF; border-radius: 18px; padding: 12px 14px; box-shadow: 0 2px 8px rgba(58,46,46,0.05); }
-.sh-stat-lbl { font-family: 'JetBrains Mono'; font-size: 9px; letter-spacing: 0.14em; color: #B5A3A3; text-transform: uppercase; }
-.sh-stat-val { font-family: 'Quicksand'; font-size: 22px; color: #3A2E2E; line-height: 1.2; margin-top: 4px; letter-spacing: -0.01em; }
-.sh-stat-unit { font-family: 'Nunito'; font-size: 11px; color: #B5A3A3; margin-left: 2px; }
-.sh-section-lbl { font-family: 'JetBrains Mono'; font-size: 9.5px; letter-spacing: 0.14em; color: #B5A3A3; text-transform: uppercase; margin: 0 6px 10px; }
-.sh-card { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #FFFFFF; border-radius: 18px; margin-bottom: 7px; box-shadow: 0 2px 8px rgba(58,46,46,0.04); }
-.sh-card.is-done { opacity: 0.55; }
-.sh-toggle { background: none; border: none; cursor: pointer; padding: 2px; flex-shrink: 0; transition: transform 0.12s; display: flex; }
-.sh-toggle:active { transform: scale(0.85); }
-.sh-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 12px; flex-shrink: 0; }
-.sh-body { flex: 1; min-width: 0; cursor: pointer; }
-.sh-name { font-family: 'Quicksand'; font-size: 14.5px; font-weight: 500; color: #3A2E2E; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sh-name.done { text-decoration: line-through; color: #B5A3A3; }
-.sh-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
-.sh-cat { font-family: 'Nunito'; font-size: 11px; color: #B5A3A3; }
-.sh-price { font-family: 'JetBrains Mono'; font-size: 12px; color: #3A2E2E; }
-.sh-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
-.sh-icon-btn { background: none; border: none; cursor: pointer; padding: 5px; color: #D8C8C8; transition: color 0.15s; display: flex; }
-.sh-icon-btn.red:active { color: oklch(0.65 0.18 25); }
-.sh-icon-btn:active { transform: scale(0.88); }
-.sh-transfer { display: flex; align-items: center; gap: 4px; font-family: 'Nunito'; font-size: 11px; font-weight: 600; color: oklch(0.45 0.07 145); background: oklch(0.82 0.05 145 / 0.22); border: none; border-radius: 999px; padding: 5px 10px; cursor: pointer; flex-shrink: 0; }
-.sh-transfer:active { opacity: 0.75; }
-.sh-empty { text-align: center; padding: 64px 16px; }
-.sh-empty-icon { font-size: 44px; margin-bottom: 14px; }
-.sh-empty-title { font-family: 'Quicksand'; font-size: 18px; color: #6E5A5A; margin-bottom: 8px; }
-.sh-empty-desc { font-family: 'Nunito'; font-size: 12px; color: #B5A3A3; margin-bottom: 22px; line-height: 1.5; }
-.sh-divider { height: 1px; background: linear-gradient(to right, #E8DDD3 0%, transparent 100%); margin: 18px 0; }
-.skel { background: linear-gradient(90deg, rgba(58,46,46,0.04) 25%, rgba(58,46,46,0.08) 50%, rgba(58,46,46,0.04) 75%); background-size: 200% 100%; animation: shimmer 1.35s infinite; border-radius: 18px; height: 64px; margin-bottom: 7px; }
-@keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
-.fade-in { animation: fadeUp 0.32s ease both; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-`
-
 const addBtnStyle = {
-  background: '#3A2E2E', color: '#FBF6F1', border: 'none',
+  background: '#3D2A2A', color: '#FFFFFF', border: '2px solid #3D2A2A',
   padding: '8px 14px', borderRadius: 999,
-  fontFamily: 'Nunito', fontWeight: 600, fontSize: 12,
+  fontFamily: "'Fredoka', system-ui", fontWeight: 700, fontSize: 12,
   display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer',
+  boxShadow: '0 3px 0 #B594D9',
 }
 
 export default function Shopping() {
@@ -74,9 +40,7 @@ export default function Shopping() {
 
   async function toggleDone(item) {
     const ref = doc(db, 'shopping', item.id)
-    const update = item.done
-      ? { done: false, doneAt: null }
-      : { done: true, doneAt: Timestamp.now() }
+    const update = item.done ? { done: false, doneAt: null } : { done: true, doneAt: Timestamp.now() }
     await updateDoc(ref, update)
     setItems(prev => prev.map(i => i.id === item.id ? { ...i, ...update } : i)
       .sort((a, b) => (a.done === b.done ? 0 : a.done ? 1 : -1)))
@@ -99,14 +63,13 @@ export default function Shopping() {
   const hasItems = pending.length > 0 || done.length > 0
 
   return (
-    <div style={{ padding: '8px 16px 16px' }}>
-      <style>{S}</style>
-
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 6px 14px' }}>
+    <div style={{ padding: '4px 14px 16px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 4px 14px' }}>
         <div>
-          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, letterSpacing: '0.15em', color: '#B5A3A3' }}>SECTION · 單</div>
-          <div style={{ fontFamily: 'Quicksand', fontSize: 26, color: '#3A2E2E', letterSpacing: '-0.01em', marginTop: 2 }}>
-            <span>購物</span> 清單
+          <div style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: '#FF92AE', fontWeight: 600 }}>shopping list ♡</div>
+          <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 26, fontWeight: 600, color: '#3D2A2A', letterSpacing: '-0.01em', marginTop: 2 }}>
+            購物清單
           </div>
         </div>
         <button style={addBtnStyle} onClick={() => navigate('/shopping/new')}>
@@ -114,110 +77,136 @@ export default function Shopping() {
         </button>
       </div>
 
+      {/* Stats trio */}
       {!loading && hasItems && (
-        <div className="sh-stats fade-in">
-          <div className="sh-stat">
-            <div className="sh-stat-lbl">待購買</div>
-            <div className="sh-stat-val">{pending.length}<span className="sh-stat-unit">項</span></div>
-          </div>
-          <div className="sh-stat">
-            <div className="sh-stat-lbl">預估花費</div>
-            <div className="sh-stat-val" style={{ fontFamily: 'JetBrains Mono', fontSize: 18 }}>
-              {estimatedTotal > 0 ? `$${estimatedTotal.toLocaleString()}` : '—'}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+          {[
+            { k: '待購買', v: String(pending.length), u: '項', col: '#FFC8D6' },
+            { k: '預估', v: estimatedTotal > 0 ? `$${estimatedTotal.toLocaleString()}` : '—', u: '', col: '#FFE4A0', mono: true },
+            { k: '已購', v: String(done.length), u: '項', col: '#C8EBD9' },
+          ].map((s, i) => (
+            <div key={i} style={{
+              flex: 1, background: s.col, borderRadius: 16, padding: '10px 10px',
+              border: '2px solid #3D2A2A', boxShadow: '0 3px 0 #3D2A2A',
+            }}>
+              <div style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 8, letterSpacing: '0.14em', color: '#3D2A2A', opacity: 0.7 }}>
+                {s.k.toUpperCase()}
+              </div>
+              <div style={{
+                fontFamily: s.mono ? "'JetBrains Mono', ui-monospace" : "'Fredoka', system-ui",
+                fontSize: s.mono ? 17 : 22, fontWeight: 700, lineHeight: 1.1,
+                marginTop: 4, letterSpacing: '-0.01em', color: '#3D2A2A',
+              }}>
+                {s.v}<span style={{ fontFamily: "'Nunito', sans-serif", fontSize: 10, color: '#7A5C5C', marginLeft: 2, fontWeight: 500 }}>{s.u}</span>
+              </div>
             </div>
-          </div>
-          <div className="sh-stat">
-            <div className="sh-stat-lbl">已購買</div>
-            <div className="sh-stat-val">{done.length}<span className="sh-stat-unit">項</span></div>
-          </div>
+          ))}
         </div>
       )}
 
       {loading ? (
-        <div>{[1,2,3,4].map(i => <div key={i} className="skel" />)}</div>
+        <div>{[1,2,3,4].map(i => <div key={i} style={{ height: 56, background: '#FFFFFF', border: '2px solid #F0E4E0', borderRadius: 16, marginBottom: 6, opacity: 0.5 }} />)}</div>
       ) : !hasItems ? (
-        <div className="sh-empty">
-          <div className="sh-empty-icon">🛒</div>
-          <div className="sh-empty-title">購物清單是空的</div>
-          <div className="sh-empty-desc">記錄想幫嬛嬛買的東西</div>
+        <div style={{ textAlign: 'center', padding: '64px 16px' }}>
+          <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 18, fontWeight: 600, color: '#3D2A2A', marginBottom: 6 }}>清單是空的</div>
+          <div style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: '#FF92AE', fontWeight: 600, marginBottom: 12 }}>♡ 記錄想幫嬛嬛買的東西</div>
           <button style={{ ...addBtnStyle, margin: '0 auto' }} onClick={() => navigate('/shopping/new')}>
             <Plus size={13} /> 新增項目
           </button>
         </div>
       ) : (
-        <div className="fade-in">
+        <div>
+          {/* Pending */}
           {pending.length > 0 && (
-            <div>
-              <div className="sh-section-lbl">待購買 · {pending.length}</div>
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingLeft: 4, marginBottom: 8 }}>
+                <span style={{ fontFamily: "'Fredoka', system-ui", fontSize: 16, color: '#FF92AE', fontWeight: 700, letterSpacing: '-0.01em' }}>待購買 · {pending.length}</span>
+              </div>
               {pending.map(item => {
                 const price = item.latestPrice ?? item.estimatedPrice ?? null
                 const trend = item.latestPrice != null && item.previousPrice != null
                   ? item.latestPrice > item.previousPrice ? 'up' : item.latestPrice < item.previousPrice ? 'down' : 'same'
                   : null
                 return (
-                  <div key={item.id} className="sh-card">
-                    <button className="sh-toggle" onClick={() => toggleDone(item)}>
-                      <Circle size={22} color="#D8C8C8" />
-                    </button>
-                    {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="sh-thumb" />}
-                    <div className="sh-body" onClick={() => navigate(`/shopping/${item.id}`)}>
-                      <div className="sh-name">{item.name}</div>
-                      <div className="sh-meta">
-                        <span className="sh-cat" style={{ color: CAT_COLORS[item.category] || '#B5A3A3' }}>
-                          {CATEGORIES[item.category] || item.category}
-                        </span>
-                        {price != null && (
-                          <>
-                            <span style={{ fontSize: 10, color: '#D8C8C8' }}>·</span>
-                            <span className="sh-price">${price.toLocaleString()}</span>
-                            {trend === 'up' && <span style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: 'oklch(0.65 0.18 25)' }}>↑</span>}
-                            {trend === 'down' && <span style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: 'oklch(0.55 0.12 145)' }}>↓</span>}
-                          </>
-                        )}
+                  <div key={item.id} style={{
+                    background: '#FFFFFF', borderRadius: 16, padding: '10px 12px', marginBottom: 6,
+                    border: '2px solid #3D2A2A', boxShadow: '0 2px 0 #3D2A2A',
+                    display: 'grid', gridTemplateColumns: '24px 1fr auto auto', gap: 10, alignItems: 'center',
+                  }}>
+                    <button onClick={() => toggleDone(item)} style={{
+                      width: 22, height: 22, borderRadius: 999,
+                      border: '2px solid #3D2A2A', background: '#fff',
+                      cursor: 'pointer', padding: 0,
+                    }} />
+                    <div onClick={() => navigate(`/shopping/${item.id}`)} style={{ minWidth: 0, cursor: 'pointer' }}>
+                      <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 14, fontWeight: 600, color: '#3D2A2A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 3, flexWrap: 'wrap' }}>
+                        <span style={{
+                          fontFamily: "'Fredoka', system-ui", fontSize: 10, fontWeight: 600,
+                          padding: '1px 7px', borderRadius: 99,
+                          background: CAT_COLORS[item.category] || '#C8E0F2', border: '1.5px solid #3D2A2A', color: '#3D2A2A',
+                        }}>{CATEGORIES[item.category] || item.category}</span>
+                        {trend === 'down' && <span style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 10, color: '#7FCCA6', fontWeight: 600 }}>↓ 比上次便宜</span>}
+                        {trend === 'up' && <span style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 10, color: '#FF92AE', fontWeight: 600 }}>↑ 比上次貴</span>}
                       </div>
                     </div>
-                    <div className="sh-actions">
-                      <button className="sh-icon-btn" onClick={() => navigate(`/shopping/${item.id}`)}>
-                        <ChevronRight size={15} />
-                      </button>
-                      <button className="sh-icon-btn red" onClick={() => handleDelete(item.id)}>
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-
-          {pending.length > 0 && done.length > 0 && <div className="sh-divider" />}
-
-          {done.length > 0 && (
-            <div>
-              <div className="sh-section-lbl">已購買 · {done.length}</div>
-              {done.map(item => (
-                <div key={item.id} className="sh-card is-done">
-                  <button className="sh-toggle" onClick={() => toggleDone(item)}>
-                    <CheckCircle2 size={22} color="#3A2E2E" />
-                  </button>
-                  <div className="sh-body">
-                    <div className="sh-name done">{item.name}</div>
-                    <div className="sh-meta">
-                      <span className="sh-cat">{CATEGORIES[item.category] || item.category}</span>
-                    </div>
-                  </div>
-                  <div className="sh-actions">
-                    <button className="sh-transfer" onClick={() => transferToExpense(item)}>
-                      記帳 <ArrowRight size={10} />
-                    </button>
-                    <button className="sh-icon-btn red" onClick={() => handleDelete(item.id)}>
+                    {price != null && (
+                      <div style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 13, fontWeight: 600, color: '#3D2A2A' }}>${price.toLocaleString()}</div>
+                    )}
+                    <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#C4A8A8' }}>
                       <Trash2 size={14} />
                     </button>
                   </div>
-                </div>
-              ))}
+                )
+              })}
+            </>
+          )}
+
+          {pending.length > 0 && done.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 14, paddingLeft: 4, marginBottom: 8 }}>
+              <span style={{ fontFamily: "'Fredoka', system-ui", fontSize: 15, color: '#7FCCA6', fontWeight: 700 }}>已購買 · {done.length}</span>
+              <div style={{ flex: 1, height: 2, background: '#F5E6E0', borderRadius: 99 }} />
             </div>
           )}
+
+          {/* Done */}
+          {done.length > 0 && pending.length === 0 && (
+            <div style={{ paddingLeft: 4, marginBottom: 8 }}>
+              <span style={{ fontFamily: "'Fredoka', system-ui", fontSize: 16, color: '#7FCCA6', fontWeight: 700 }}>已購買 · {done.length}</span>
+            </div>
+          )}
+          {done.map(item => (
+            <div key={item.id} style={{
+              background: '#FFFFFF', borderRadius: 16, padding: '10px 12px', marginBottom: 6,
+              border: '2px solid #3D2A2A', boxShadow: '0 2px 0 #3D2A2A',
+              display: 'grid', gridTemplateColumns: '24px 1fr auto auto', gap: 10, alignItems: 'center',
+              opacity: 0.65,
+            }}>
+              <button onClick={() => toggleDone(item)} style={{
+                width: 22, height: 22, borderRadius: 999,
+                background: '#7FCCA6', border: '2px solid #3D2A2A',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', padding: 0,
+              }}>
+                <svg width="12" height="12" viewBox="0 0 24 24">
+                  <path d="M5 12 L10 17 L19 7" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              <div>
+                <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 14, fontWeight: 600, textDecoration: 'line-through', color: '#7A5C5C' }}>{item.name}</div>
+                <div style={{ fontFamily: "'Nunito', sans-serif", fontSize: 10, color: '#C4A8A8', marginTop: 2 }}>{CATEGORIES[item.category] || item.category}</div>
+              </div>
+              <button onClick={() => transferToExpense(item)} style={{
+                fontFamily: "'Fredoka', system-ui", fontSize: 10, fontWeight: 700,
+                padding: '4px 10px', borderRadius: 99,
+                background: '#C8EBD9', border: '1.5px solid #3D2A2A', color: '#3D2A2A',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3,
+              }}>記帳 <ArrowRight size={10} /></button>
+              <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#C4A8A8' }}>
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))}
         </div>
       )}
     </div>

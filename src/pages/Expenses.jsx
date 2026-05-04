@@ -7,10 +7,10 @@ import { Plus, Trash2 } from 'lucide-react'
 
 const CATEGORIES = { food: '食品', medical: '醫療', supplies: '用品', other: '其他' }
 const COLORS = {
-  food: 'oklch(0.88 0.05 15)',
-  medical: 'oklch(0.78 0.06 25)',
-  supplies: 'oklch(0.78 0.05 75)',
-  other: '#B5A3A3',
+  food:     { soft: '#FFD4B0', deep: '#FFA877' },
+  medical:  { soft: '#C8EBD9', deep: '#7FCCA6' },
+  supplies: { soft: '#E0CFF2', deep: '#B594D9' },
+  other:    { soft: '#C8E0F2', deep: '#7FB3DB' },
 }
 
 export default function Expenses() {
@@ -48,32 +48,44 @@ export default function Expenses() {
     return acc
   }, {})
 
+  const chips = [
+    ['all',      '全部', '#3D2A2A'],
+    ['food',     '食品', '#FFA877'],
+    ['medical',  '醫療', '#7FCCA6'],
+    ['supplies', '用品', '#B594D9'],
+    ['other',    '其他', '#7FB3DB'],
+  ]
+
   return (
-    <div style={{ padding: '8px 16px 16px' }}>
+    <div style={{ padding: '4px 14px 16px' }}>
       {/* Hero */}
       <div style={{
-        background: 'linear-gradient(150deg, oklch(0.88 0.05 15) 0%, oklch(0.94 0.04 20) 100%)',
-        color: '#3A2E2E', borderRadius: 28, padding: 22,
-        boxShadow: '0 10px 30px oklch(0.78 0.06 25 / 0.2)',
+        background: '#FFD4B0', borderRadius: 26, padding: 20,
+        border: '2px solid #3D2A2A',
+        boxShadow: '0 4px 0 #3D2A2A',
+        position: 'relative',
       }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" style={{ position: 'absolute', right: 16, top: 14, transform: 'rotate(-10deg)' }}>
+          <path d="M12 2 L13.5 9 L20 10 L13.5 11 L12 18 L10.5 11 L4 10 L10.5 9 Z" fill="#FFFFFF" />
+        </svg>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, letterSpacing: '0.15em', opacity: 0.65 }}>
-              {monthLabel.toUpperCase()} · 本月花費
-            </div>
-            <div style={{ fontFamily: 'Quicksand', fontSize: 56, lineHeight: 0.95, fontWeight: 400, letterSpacing: '-0.03em', marginTop: 6 }}>
-              <span style={{ fontFamily: 'JetBrains Mono', fontSize: 16, opacity: 0.6, marginRight: 4 }}>NT$</span>
+            <div style={{ fontFamily: "'Caveat', cursive", fontSize: 18, fontWeight: 600, color: '#3D2A2A' }}>{monthLabel} ♡</div>
+            <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 56, lineHeight: 0.95, fontWeight: 700, letterSpacing: '-0.03em', color: '#3D2A2A', marginTop: 4 }}>
+              <span style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 16, fontWeight: 500 }}>NT$</span>
               {monthTotal.toLocaleString()}
             </div>
-            <div style={{ fontFamily: 'Nunito', fontSize: 12, marginTop: 6, opacity: 0.75 }}>
-              {monthExp.length} 筆
+            <div style={{ fontFamily: "'Nunito', sans-serif", fontSize: 12, color: '#3D2A2A', opacity: 0.7, marginTop: 6 }}>
+              {monthExp.length} 筆 · 本月花費
             </div>
           </div>
           <button onClick={() => navigate('/expenses/new')} style={{
-            background: '#3A2E2E', color: '#FBF6F1', border: 'none',
+            background: '#3D2A2A', color: '#FFFFFF',
+            border: '2px solid #3D2A2A',
             padding: '8px 14px', borderRadius: 999,
-            fontFamily: 'Nunito', fontWeight: 600, fontSize: 12,
+            fontFamily: "'Fredoka', system-ui", fontWeight: 700, fontSize: 12,
             display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer',
+            boxShadow: '0 3px 0 #FFB388',
           }}>
             <Plus size={13} /> 新增
           </button>
@@ -81,27 +93,33 @@ export default function Expenses() {
       </div>
 
       {/* Filter chips */}
-      <div style={{ display: 'flex', gap: 6, marginTop: 14, overflowX: 'auto', paddingBottom: 4 }}>
-        {[['all','全部'], ['food','食品'], ['medical','醫療'], ['supplies','用品'], ['other','其他']].map(([k, l]) => (
-          <span key={k} onClick={() => setFilter(k)} style={{
-            padding: '6px 14px', borderRadius: 999, whiteSpace: 'nowrap',
-            background: filter === k ? '#3A2E2E' : '#FFFFFF',
-            color: filter === k ? '#FBF6F1' : '#6E5A5A',
-            fontFamily: 'Nunito', fontSize: 12, fontWeight: 500,
-            boxShadow: filter === k ? 'none' : '0 2px 6px rgba(58,46,46,0.05)',
-            cursor: 'pointer',
-          }}>{l}</span>
-        ))}
+      <div style={{ display: 'flex', gap: 6, marginTop: 12, overflowX: 'auto', paddingBottom: 4 }}>
+        {chips.map(([k, l, col]) => {
+          const on = filter === k
+          return (
+            <span key={k} onClick={() => setFilter(k)} style={{
+              padding: '6px 14px', borderRadius: 999, whiteSpace: 'nowrap',
+              background: on ? col : '#FFFFFF',
+              color: on ? '#FFFFFF' : '#3D2A2A',
+              border: '2px solid #3D2A2A',
+              fontFamily: "'Fredoka', system-ui", fontSize: 12, fontWeight: 600,
+              boxShadow: on ? '0 2px 0 #3D2A2A' : '0 2px 0 rgba(61,42,42,0.6)',
+              cursor: 'pointer',
+            }}>{l}</span>
+          )
+        })}
       </div>
 
       {loading ? (
-        <div style={{ marginTop: 14 }}>{[1,2,3,4].map(i => <div key={i} style={{ height: 56, background: '#FFFFFF', borderRadius: 18, marginBottom: 6, opacity: 0.6 }} />)}</div>
+        <div style={{ marginTop: 14 }}>{[1,2,3,4].map(i => <div key={i} style={{ height: 56, background: '#FFFFFF', border: '2px solid #F0E4E0', borderRadius: 16, marginBottom: 6, opacity: 0.6 }} />)}</div>
       ) : visible.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '64px 16px', color: '#B5A3A3' }}>
-          <div style={{ fontFamily: 'Quicksand', fontSize: 18, marginBottom: 12, color: '#6E5A5A' }}>還沒有紀錄</div>
+        <div style={{ textAlign: 'center', padding: '64px 16px' }}>
+          <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 18, fontWeight: 600, color: '#3D2A2A', marginBottom: 6 }}>還沒有紀錄</div>
+          <div style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: '#FF92AE', fontWeight: 600, marginBottom: 12 }}>♡ 來記第一筆吧</div>
           <button onClick={() => navigate('/expenses/new')} style={{
-            background: '#3A2E2E', color: '#FBF6F1', border: 'none',
-            padding: '10px 18px', borderRadius: 999, fontFamily: 'Nunito', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            background: '#3D2A2A', color: '#FFFFFF', border: '2px solid #3D2A2A',
+            padding: '10px 18px', borderRadius: 999, fontFamily: "'Fredoka', system-ui", fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            boxShadow: '0 3px 0 #FFA877',
           }}>＋ 新增第一筆</button>
         </div>
       ) : (
@@ -112,33 +130,36 @@ export default function Expenses() {
             return (
               <div key={m} style={{ marginBottom: 14 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 6px 6px' }}>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 9.5, letterSpacing: '0.14em', color: '#B5A3A3' }}>{y} · {parseInt(mm)}月</div>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: '#6E5A5A' }}>${total.toLocaleString()}</div>
+                  <div style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: '#FF92AE', fontWeight: 600 }}>{y} · {parseInt(mm)}月 ♡</div>
+                  <div style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 11, color: '#7A5C5C' }}>${total.toLocaleString()}</div>
                 </div>
-                {items.map(it => (
-                  <div key={it.id} style={{
-                    background: '#FFFFFF', borderRadius: 18, padding: '12px 14px', marginBottom: 6,
-                    display: 'grid', gridTemplateColumns: 'auto 44px 1fr auto auto', gap: 10, alignItems: 'center',
-                    boxShadow: '0 2px 8px rgba(58,46,46,0.04)',
-                  }}>
-                    {it.photo?.url ? (
-                      <a href={it.photo.url} target="_blank" rel="noreferrer">
-                        <img src={it.photo.url} alt="" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover' }} />
-                      </a>
-                    ) : (
-                      <div style={{ width: 8, height: 8, borderRadius: 999, background: COLORS[it.category] || '#B5A3A3' }} />
-                    )}
-                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#B5A3A3' }}>{it.date?.slice(5)}</div>
-                    <div>
-                      <div style={{ fontFamily: 'Quicksand', fontSize: 15, fontWeight: 500, color: '#3A2E2E' }}>{it.name}</div>
-                      <div style={{ fontFamily: 'Nunito', fontSize: 11, color: '#B5A3A3' }}>{CATEGORIES[it.category]}</div>
+                {items.map(it => {
+                  const c = COLORS[it.category] || COLORS.other
+                  return (
+                    <div key={it.id} style={{
+                      background: '#FFFFFF', borderRadius: 16, padding: '10px 12px', marginBottom: 6,
+                      border: '2px solid #3D2A2A', boxShadow: '0 2px 0 #3D2A2A',
+                      display: 'grid', gridTemplateColumns: 'auto 28px 1fr auto auto', gap: 10, alignItems: 'center',
+                    }}>
+                      {it.photo?.url ? (
+                        <a href={it.photo.url} target="_blank" rel="noreferrer">
+                          <img src={it.photo.url} alt="" style={{ width: 30, height: 30, borderRadius: 8, objectFit: 'cover', border: '1.5px solid #3D2A2A' }} />
+                        </a>
+                      ) : (
+                        <div style={{ width: 24, height: 24, borderRadius: 8, background: c.soft, border: '1.5px solid #3D2A2A' }} />
+                      )}
+                      <div style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 9, color: '#C4A8A8' }}>{it.date?.slice(5)}</div>
+                      <div>
+                        <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 14, fontWeight: 600, color: '#3D2A2A' }}>{it.name}</div>
+                        <div style={{ fontFamily: "'Nunito', sans-serif", fontSize: 10, color: '#7A5C5C' }}>{CATEGORIES[it.category]}</div>
+                      </div>
+                      <div style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 13, fontWeight: 500, color: '#3D2A2A' }}>${it.amount?.toLocaleString()}</div>
+                      <button onClick={() => handleDelete(it.id)} style={{ background: 'none', border: 'none', color: '#C4A8A8', cursor: 'pointer', padding: 4 }}>
+                        <Trash2 size={14} />
+                      </button>
                     </div>
-                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: '#3A2E2E' }}>${it.amount?.toLocaleString()}</div>
-                    <button onClick={() => handleDelete(it.id)} style={{ background: 'none', border: 'none', color: '#D8C8C8', cursor: 'pointer', padding: 4 }}>
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )
           })}

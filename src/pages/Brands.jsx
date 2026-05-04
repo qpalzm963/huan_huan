@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { collection, getDocs, deleteDoc, doc, orderBy, query, getCountFromServer } from 'firebase/firestore'
 import { db } from '../firebase'
-import { Plus, Trash2, Star, ChevronRight, Tag, Package, X } from 'lucide-react'
+import { Plus, Trash2, ChevronRight, Tag, Package, X } from 'lucide-react'
 
 const LOCAL_ICONS = {
   'PS BUBU': '/huan_huan/brand-icons/ps_bubu.png',
@@ -11,83 +11,36 @@ const LOCAL_ICONS = {
   '貓有話說': '/huan_huan/brand-icons/maohuashuo.png',
 }
 
-const STAR_FILL = 'oklch(0.78 0.06 25)'
-const STAR_EMPTY = '#D8C8C8'
+// Rotation of fallback colors (for branded chip when no icon)
+const BRAND_COLORS = ['#FFC8D6', '#C8EBD9', '#FFD4B0', '#E0CFF2', '#FFE4A0', '#C8E0F2']
 
-function BrandAvatar({ brand, size = 'sm' }) {
+function BrandAvatar({ brand, idx = 0, size = 44 }) {
   const icon = brand.iconUrl || LOCAL_ICONS[brand.name]
-  const sm = size === 'sm'
-  const style = {
-    width: sm ? 44 : 60,
-    height: sm ? 44 : 60,
-    borderRadius: 14,
-    flexShrink: 0,
-    objectFit: 'contain',
-    background: '#FBF6F1',
-    border: '1px solid #EFE3D6',
-  }
-  if (icon) return <img src={icon} alt={brand.name} style={style} />
+  if (icon) return (
+    <img src={icon} alt={brand.name} style={{
+      width: size, height: size, borderRadius: 14, objectFit: 'contain',
+      background: '#fff', border: '2px solid #3D2A2A', flexShrink: 0,
+    }} />
+  )
   return (
     <div style={{
-      ...style,
-      background: '#3A2E2E',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: '#FBF6F1',
-      fontFamily: 'Quicksand',
-      fontWeight: 500,
-      fontSize: sm ? 16 : 22,
-    }}>
-      {brand.name?.[0] || '?'}
-    </div>
+      width: size, height: size, borderRadius: 14,
+      background: BRAND_COLORS[idx % BRAND_COLORS.length],
+      border: '2px solid #3D2A2A', flexShrink: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: '#3D2A2A', fontFamily: "'Fredoka', system-ui", fontWeight: 700, fontSize: 16,
+    }}>{brand.name?.[0] || '?'}</div>
   )
 }
 
-export { BrandAvatar, LOCAL_ICONS, STAR_FILL, STAR_EMPTY }
-
-const S = `
-.br-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #FFFFFF; border-radius: 20px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(58,46,46,0.05); cursor: pointer; transition: transform 0.15s; }
-.br-card:active { transform: scale(0.99); }
-.br-name { font-family: 'Quicksand'; font-size: 15px; font-weight: 500; color: #3A2E2E; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.br-count { font-family: 'JetBrains Mono'; font-size: 10px; color: #B5A3A3; margin-top: 3px; letter-spacing: 0.08em; }
-.br-stars { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
-.br-icon-btn { color: #D8C8C8; background: none; border: none; cursor: pointer; padding: 5px; flex-shrink: 0; transition: color 0.15s; }
-.br-icon-btn:active { color: oklch(0.78 0.06 25); }
-.br-empty { text-align: center; padding: 64px 16px; }
-.br-empty-icon { font-size: 44px; margin-bottom: 14px; }
-.br-empty-title { font-family: 'Quicksand'; font-size: 18px; color: #6E5A5A; margin-bottom: 8px; }
-.br-empty-desc { font-family: 'Nunito'; font-size: 12px; color: #B5A3A3; margin-bottom: 22px; line-height: 1.5; }
-.skel { background: linear-gradient(90deg, rgba(58,46,46,0.04) 25%, rgba(58,46,46,0.08) 50%, rgba(58,46,46,0.04) 75%); background-size: 200% 100%; animation: shimmer 1.35s infinite; border-radius: 20px; height: 76px; margin-bottom: 8px; }
-@keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
-.fade-in { animation: fadeUp 0.32s ease both; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Bottom Sheet */
-.bs-overlay { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; justify-content: flex-end; }
-.bs-bg { position: absolute; inset: 0; background: rgba(58,46,46,0.45); }
-.bs-panel { position: relative; background: #FBF6F1; border-radius: 28px 28px 0 0; padding: 8px 20px 32px; }
-.bs-handle { width: 36px; height: 4px; background: #D8C8C8; border-radius: 100px; margin: 10px auto 18px; }
-.bs-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.bs-header-title { font-family: 'Quicksand'; font-size: 20px; font-weight: 500; color: #3A2E2E; }
-.bs-close { background: rgba(58,46,46,0.06); border: none; border-radius: 12px; padding: 6px; cursor: pointer; color: #6E5A5A; display: flex; }
-.bs-close:active { background: rgba(58,46,46,0.12); }
-.bs-btn { display: flex; align-items: center; gap: 14px; background: #FFFFFF; border-radius: 18px; padding: 14px 16px; border: none; box-shadow: 0 2px 8px rgba(58,46,46,0.04); cursor: pointer; width: 100%; margin-bottom: 8px; text-align: left; transition: transform 0.15s; }
-.bs-btn:active { transform: scale(0.99); }
-.bs-btn-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.bs-btn-title { font-family: 'Quicksand'; font-size: 15px; font-weight: 500; color: #3A2E2E; }
-.bs-btn-sub { font-family: 'Nunito'; font-size: 11px; color: #B5A3A3; margin-top: 2px; }
-.bs-pick { display: flex; align-items: center; gap: 12px; background: #FFFFFF; border-radius: 16px; padding: 12px 14px; border: none; box-shadow: 0 2px 8px rgba(58,46,46,0.04); cursor: pointer; width: 100%; margin-bottom: 6px; text-align: left; }
-.bs-pick:active { transform: scale(0.99); }
-.bs-pick-name { font-family: 'Quicksand'; font-size: 15px; font-weight: 500; color: #3A2E2E; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bs-pick-scroll { max-height: 280px; overflow-y: auto; }
-`
+export { BrandAvatar, LOCAL_ICONS }
 
 const addBtnStyle = {
-  background: '#3A2E2E', color: '#FBF6F1', border: 'none',
+  background: '#3D2A2A', color: '#FFFFFF', border: '2px solid #3D2A2A',
   padding: '8px 14px', borderRadius: 999,
-  fontFamily: 'Nunito', fontWeight: 600, fontSize: 12,
+  fontFamily: "'Fredoka', system-ui", fontWeight: 700, fontSize: 12,
   display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer',
+  boxShadow: '0 3px 0 #F5C04D',
 }
 
 export default function Brands() {
@@ -121,15 +74,17 @@ export default function Brands() {
     setBrands(prev => prev.filter(b => b.id !== id))
   }
 
-  return (
-    <div style={{ padding: '8px 16px 16px' }}>
-      <style>{S}</style>
+  const totalProducts = Object.values(productCounts).reduce((a, b) => a + b, 0)
+  const fiveStarCount = brands.filter(b => (b.rating || 0) === 5).length
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 6px 14px' }}>
+  return (
+    <div style={{ padding: '4px 14px 16px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 4px 14px' }}>
         <div>
-          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, letterSpacing: '0.15em', color: '#B5A3A3' }}>SECTION · 牌</div>
-          <div style={{ fontFamily: 'Quicksand', fontSize: 26, color: '#3A2E2E', letterSpacing: '-0.01em', marginTop: 2 }}>
-            <span>品牌</span> 管理
+          <div style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: '#FF92AE', fontWeight: 600 }}>brand library ♡</div>
+          <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 26, fontWeight: 600, color: '#3D2A2A', letterSpacing: '-0.01em', marginTop: 2 }}>
+            品牌管理
           </div>
         </div>
         <button style={addBtnStyle} onClick={() => setSheet('choice')}>
@@ -137,88 +92,135 @@ export default function Brands() {
         </button>
       </div>
 
+      {/* Hero card */}
+      {!loading && brands.length > 0 && (
+        <div style={{
+          background: '#FFE4A0', borderRadius: 24, padding: 18,
+          border: '2px solid #3D2A2A', boxShadow: '0 4px 0 #3D2A2A',
+          marginBottom: 14, position: 'relative',
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" style={{ position: 'absolute', right: 16, top: 14, transform: 'rotate(15deg)' }}>
+            <path d="M12 2 L13.5 9 L20 10 L13.5 11 L12 18 L10.5 11 L4 10 L10.5 9 Z" fill="#FF92AE" />
+          </svg>
+          <div style={{ fontFamily: "'Caveat', cursive", fontSize: 18, color: '#3D2A2A', fontWeight: 600 }}>嬛嬛的最愛 ♡</div>
+          <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 44, lineHeight: 1, fontWeight: 700, letterSpacing: '-0.02em', color: '#3D2A2A', marginTop: 4 }}>
+            {brands.length}<span style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 14, marginLeft: 4, fontWeight: 500 }}>brands</span>
+          </div>
+          <div style={{ fontFamily: "'Nunito', sans-serif", fontSize: 11, marginTop: 6, color: '#3D2A2A', opacity: 0.7 }}>
+            共 {totalProducts} 個產品 · {fiveStarCount} 個 5 星評價
+          </div>
+        </div>
+      )}
+
       {loading ? (
-        <div>{[1, 2, 3].map(i => <div key={i} className="skel" />)}</div>
+        <div>{[1, 2, 3].map(i => <div key={i} style={{ height: 64, background: '#FFFFFF', border: '2px solid #F0E4E0', borderRadius: 18, marginBottom: 7, opacity: 0.5 }} />)}</div>
       ) : brands.length === 0 ? (
-        <div className="br-empty">
-          <div className="br-empty-icon">🏷️</div>
-          <div className="br-empty-title">還沒有品牌紀錄</div>
-          <div className="br-empty-desc">記錄嬛嬛喜歡的品牌</div>
+        <div style={{ textAlign: 'center', padding: '64px 16px' }}>
+          <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 18, fontWeight: 600, color: '#3D2A2A', marginBottom: 6 }}>還沒有品牌</div>
+          <div style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: '#FF92AE', fontWeight: 600, marginBottom: 12 }}>♡ 記錄嬛嬛喜歡的品牌</div>
           <button style={{ ...addBtnStyle, margin: '0 auto' }} onClick={() => navigate('/brands/new')}>
             <Plus size={13} /> 新增品牌
           </button>
         </div>
       ) : (
-        <div className="fade-in">
-          {brands.map(brand => (
-            <div key={brand.id} className="br-card" onClick={() => navigate(`/brands/${brand.id}`)}>
-              <BrandAvatar brand={brand} size="sm" />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="br-name">{brand.name}</div>
+        <div>
+          {brands.map((brand, i) => (
+            <div key={brand.id} onClick={() => navigate(`/brands/${brand.id}`)} style={{
+              background: '#FFFFFF', borderRadius: 18, padding: '10px 12px', marginBottom: 7,
+              border: '2px solid #3D2A2A', boxShadow: '0 2px 0 #3D2A2A',
+              display: 'grid', gridTemplateColumns: '44px 1fr auto auto', gap: 12, alignItems: 'center',
+              cursor: 'pointer',
+            }}>
+              <BrandAvatar brand={brand} idx={i} />
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 14.5, fontWeight: 600, color: '#3D2A2A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{brand.name}</div>
                 {productCounts[brand.id] > 0 && (
-                  <div className="br-count">{productCounts[brand.id]} 個產品</div>
+                  <div style={{ fontFamily: "'JetBrains Mono', ui-monospace", fontSize: 10, color: '#C4A8A8', marginTop: 2, letterSpacing: '0.08em' }}>
+                    {productCounts[brand.id]} 個產品
+                  </div>
                 )}
               </div>
-              <div className="br-stars">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} size={12}
-                    style={{ fill: i < (brand.rating || 0) ? STAR_FILL : 'none', color: i < (brand.rating || 0) ? STAR_FILL : STAR_EMPTY }}
-                  />
+              <div style={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                {Array.from({ length: 5 }).map((_, k) => (
+                  <svg key={k} width="11" height="11" viewBox="0 0 24 24">
+                    <path d="M12 2 L14.5 9 L22 10 L16.5 14.5 L18 22 L12 18 L6 22 L7.5 14.5 L2 10 L9.5 9 Z"
+                      fill={k < (brand.rating || 0) ? '#F5C04D' : '#fff'}
+                      stroke="#3D2A2A" strokeWidth="1.5" strokeLinejoin="round" />
+                  </svg>
                 ))}
               </div>
-              <button className="br-icon-btn" onClick={e => handleDelete(e, brand.id)}>
-                <Trash2 size={15} />
+              <button onClick={e => handleDelete(e, brand.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#C4A8A8' }}>
+                <Trash2 size={14} />
               </button>
-              <ChevronRight size={15} style={{ color: '#D8C8C8', flexShrink: 0 }} />
             </div>
           ))}
         </div>
       )}
 
+      {/* Bottom Sheet */}
       {sheet && (
-        <div className="bs-overlay" onClick={() => setSheet(null)}>
-          <div className="bs-bg" />
-          <div className="bs-panel" onClick={e => e.stopPropagation()}>
-            <div className="bs-handle" />
-            <div className="bs-header">
-              <div className="bs-header-title">
+        <div onClick={() => setSheet(null)} style={{
+          position: 'fixed', inset: 0, zIndex: 50,
+          display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+          background: 'rgba(61,42,42,0.45)',
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: '#FFF9F2', borderRadius: '28px 28px 0 0',
+            padding: '8px 20px 32px',
+            border: '2px solid #3D2A2A', borderBottom: 'none',
+          }}>
+            <div style={{ width: 36, height: 4, background: '#3D2A2A', borderRadius: 100, margin: '10px auto 18px', opacity: 0.3 }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 20, fontWeight: 600, color: '#3D2A2A' }}>
                 {sheet === 'pick-brand' ? '選擇品牌' : '新增'}
               </div>
-              <button className="bs-close" onClick={() => setSheet(null)}>
-                <X size={18} />
+              <button onClick={() => setSheet(null)} style={{ background: '#FFE4A0', border: '2px solid #3D2A2A', borderRadius: 12, padding: 4, cursor: 'pointer', display: 'flex' }}>
+                <X size={16} color="#3D2A2A" />
               </button>
             </div>
 
             {sheet === 'choice' && (
               <>
-                <button className="bs-btn" onClick={() => { setSheet(null); navigate('/brands/new') }}>
-                  <div className="bs-btn-icon" style={{ background: 'oklch(0.78 0.06 25 / 0.18)' }}>
-                    <Tag size={18} color="oklch(0.55 0.08 25)" />
+                <button onClick={() => { setSheet(null); navigate('/brands/new') }} style={{
+                  display: 'flex', alignItems: 'center', gap: 14, width: '100%',
+                  background: '#FFFFFF', borderRadius: 18, padding: '12px 14px', marginBottom: 8,
+                  border: '2px solid #3D2A2A', boxShadow: '0 2px 0 #3D2A2A', cursor: 'pointer', textAlign: 'left',
+                }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: '#FFC8D6', border: '2px solid #3D2A2A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Tag size={18} color="#3D2A2A" />
                   </div>
                   <div>
-                    <div className="bs-btn-title">新增品牌</div>
-                    <div className="bs-btn-sub">記錄一個新品牌</div>
+                    <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 15, fontWeight: 600, color: '#3D2A2A' }}>新增品牌</div>
+                    <div style={{ fontFamily: "'Nunito', sans-serif", fontSize: 11, color: '#C4A8A8', marginTop: 2 }}>記錄一個新品牌</div>
                   </div>
                 </button>
-                <button className="bs-btn" onClick={() => brands.length > 0 ? setSheet('pick-brand') : navigate('/brands/new')}>
-                  <div className="bs-btn-icon" style={{ background: 'oklch(0.82 0.05 145 / 0.22)' }}>
-                    <Package size={18} color="oklch(0.45 0.07 145)" />
+                <button onClick={() => brands.length > 0 ? setSheet('pick-brand') : navigate('/brands/new')} style={{
+                  display: 'flex', alignItems: 'center', gap: 14, width: '100%',
+                  background: '#FFFFFF', borderRadius: 18, padding: '12px 14px',
+                  border: '2px solid #3D2A2A', boxShadow: '0 2px 0 #3D2A2A', cursor: 'pointer', textAlign: 'left',
+                }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: '#C8EBD9', border: '2px solid #3D2A2A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Package size={18} color="#3D2A2A" />
                   </div>
                   <div>
-                    <div className="bs-btn-title">新增產品</div>
-                    <div className="bs-btn-sub">選擇品牌後新增產品</div>
+                    <div style={{ fontFamily: "'Fredoka', system-ui", fontSize: 15, fontWeight: 600, color: '#3D2A2A' }}>新增產品</div>
+                    <div style={{ fontFamily: "'Nunito', sans-serif", fontSize: 11, color: '#C4A8A8', marginTop: 2 }}>選擇品牌後新增產品</div>
                   </div>
                 </button>
               </>
             )}
 
             {sheet === 'pick-brand' && (
-              <div className="bs-pick-scroll">
-                {brands.map(brand => (
-                  <button key={brand.id} className="bs-pick" onClick={() => { setSheet(null); navigate(`/brands/${brand.id}/products/new`) }}>
-                    <BrandAvatar brand={brand} size="sm" />
-                    <span className="bs-pick-name">{brand.name}</span>
-                    <ChevronRight size={15} color="#D8C8C8" />
+              <div style={{ maxHeight: 280, overflowY: 'auto' }}>
+                {brands.map((brand, i) => (
+                  <button key={brand.id} onClick={() => { setSheet(null); navigate(`/brands/${brand.id}/products/new`) }} style={{
+                    display: 'flex', alignItems: 'center', gap: 12, width: '100%',
+                    background: '#FFFFFF', borderRadius: 16, padding: '10px 12px', marginBottom: 6,
+                    border: '2px solid #3D2A2A', boxShadow: '0 2px 0 #3D2A2A', cursor: 'pointer', textAlign: 'left',
+                  }}>
+                    <BrandAvatar brand={brand} idx={i} size={36} />
+                    <span style={{ fontFamily: "'Fredoka', system-ui", fontSize: 14, fontWeight: 600, color: '#3D2A2A', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{brand.name}</span>
+                    <ChevronRight size={15} color="#C4A8A8" />
                   </button>
                 ))}
               </div>
