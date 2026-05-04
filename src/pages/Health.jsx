@@ -5,59 +5,18 @@ import { ref as storageRef, deleteObject } from 'firebase/storage'
 import { db, storage } from '../firebase'
 import { Plus, Trash2 } from 'lucide-react'
 
-const TABS = ['體重', '保健', '貓砂', '醫療', '異常']
-const TABS_EMOJI = ['⚖️', '💊', '🧹', '🏥', '🚨']
+const TABS = [
+  { k: 'weight', label: '體重', sub: 'WT' },
+  { k: 'preventive', label: '保健', sub: 'CARE' },
+  { k: 'litter', label: '貓砂', sub: 'LITTER' },
+  { k: 'visit', label: '醫療', sub: 'VET' },
+  { k: 'anomaly', label: '異常', sub: 'ALERT' },
+]
 const PREVENTIVE_TYPES = ['vaccine', 'deworming_internal', 'deworming_external']
-const PREVENTIVE_BADGE = {
-  vaccine: { label: '疫苗', color: '#34D399' },
-  deworming_internal: { label: '體內驅蟲', color: '#F59E0B' },
-  deworming_external: { label: '體外驅蟲', color: '#C084FC' },
-}
+const PREVENTIVE_LABEL = { vaccine: '疫苗', deworming_internal: '體內驅蟲', deworming_external: '體外驅蟲' }
 const LITTER_TYPES = ['litter_large', 'litter_small']
-const LITTER_BADGE = {
-  litter_large: { label: '大貓砂盆', color: '#8B6F47' },
-  litter_small: { label: '小貓砂盆', color: '#D4A574' },
-}
-const SEVERITY_BADGE = {
-  mild: { label: '輕微', color: '#F59E0B' },
-  moderate: { label: '中等', color: '#F97316' },
-  severe: { label: '嚴重', color: '#EF4444' },
-}
-
-const S = `
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap');
-.hl-page { background: #F5F0EB; min-height: 100%; padding: 20px 20px 48px; }
-.hl-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.hl-title { font-family: 'Caveat', cursive; font-size: 34px; font-weight: 700; color: #1A4F6E; line-height: 1; }
-.hl-add { display: flex; align-items: center; gap: 5px; background: #1A4F6E; color: #fff; font-size: 13px; font-weight: 700; padding: 9px 18px; border-radius: 100px; border: none; cursor: pointer; }
-.hl-add:active { opacity: 0.8; transform: scale(0.97); }
-.hl-tabs { display: flex; gap: 6px; margin-bottom: 20px; background: rgba(255,255,255,0.55); border-radius: 16px; padding: 5px; border: 1px solid rgba(176,216,238,0.4); }
-.hl-tab { flex: 1; padding: 9px 4px; border-radius: 12px; font-size: 12px; font-weight: 600; border: none; background: transparent; color: #9BBDD0; cursor: pointer; transition: all 0.18s; white-space: nowrap; }
-.hl-tab.active { background: #1A4F6E; color: #fff; box-shadow: 0 2px 8px rgba(26,79,110,0.2); }
-.hl-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px 15px; background: rgba(255,255,255,0.76); border-radius: 18px; margin-bottom: 7px; border: 1px solid rgba(176,216,238,0.4); backdrop-filter: blur(5px); }
-.hl-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
-.hl-body { flex: 1; min-width: 0; }
-.hl-weight { font-family: 'Caveat', cursive; font-size: 28px; font-weight: 700; color: #1A4F6E; line-height: 1; }
-.hl-weight-unit { font-size: 14px; font-family: system-ui; color: #9BBDD0; font-weight: 500; margin-left: 2px; }
-.hl-name { font-size: 14px; font-weight: 600; color: #1A4F6E; }
-.hl-badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 100px; margin-left: 6px; }
-.hl-next { font-size: 11px; font-weight: 600; margin-top: 4px; }
-.hl-date { font-size: 11px; color: #9BBDD0; margin-top: 3px; }
-.hl-visit-clinic { font-size: 14px; font-weight: 600; color: #1A4F6E; }
-.hl-visit-reason { font-size: 12px; color: #7BAEC8; margin-top: 2px; }
-.hl-del { color: #C8DDE8; background: none; border: none; cursor: pointer; padding: 5px; margin-left: auto; flex-shrink: 0; transition: color 0.15s; }
-.hl-del:active { color: #F87171; }
-.hl-empty { text-align: center; padding: 64px 0; }
-.hl-empty-icon { font-size: 48px; margin-bottom: 14px; }
-.hl-empty-text { font-size: 14px; color: #9BBDD0; margin-bottom: 22px; font-weight: 500; }
-.hl-anomaly-symptom { font-size: 14px; font-weight: 600; color: #1A4F6E; line-height: 1.4; }
-.hl-anomaly-photos { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-.hl-anomaly-photo { width: 58px; height: 58px; border-radius: 9px; object-fit: cover; border: 1px solid rgba(176,216,238,0.4); }
-.skel { background: linear-gradient(90deg, rgba(176,216,238,0.22) 25%, rgba(176,216,238,0.48) 50%, rgba(176,216,238,0.22) 75%); background-size: 200% 100%; animation: shimmer 1.35s infinite; border-radius: 18px; height: 68px; margin-bottom: 7px; }
-@keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
-.fade-in { animation: fadeUp 0.3s ease both; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-`
+const LITTER_LABEL = { litter_large: '大貓砂盆', litter_small: '小貓砂盆' }
+const SEVERITY_LABEL = { mild: '輕微', moderate: '中等', severe: '嚴重' }
 
 export default function Health() {
   const navigate = useNavigate()
@@ -73,149 +32,137 @@ export default function Health() {
 
   async function handleDelete(id) {
     if (!confirm('確定要刪除？')) return
-    const record = records.find(r => r.id === id)
-    if (record?.type === 'anomaly' && record?.photos?.length > 0) {
-      await Promise.all(record.photos.map(p =>
-        deleteObject(storageRef(storage, p.path)).catch(() => {})
-      ))
+    const r = records.find(x => x.id === id)
+    if (r?.type === 'anomaly' && r?.photos?.length > 0) {
+      await Promise.all(r.photos.map(p => deleteObject(storageRef(storage, p.path)).catch(() => {})))
     }
     await deleteDoc(doc(db, 'health', id))
-    setRecords(prev => prev.filter(r => r.id !== id))
+    setRecords(prev => prev.filter(x => x.id !== id))
   }
 
-  const filtered = tab === 1
-    ? records.filter(r => PREVENTIVE_TYPES.includes(r.type))
-    : tab === 2
-    ? records.filter(r => LITTER_TYPES.includes(r.type))
-    : records.filter(r => r.type === ['weight', null, null, 'visit', 'anomaly'][tab])
+  const filtered = (() => {
+    const k = TABS[tab].k
+    if (k === 'preventive') return records.filter(r => PREVENTIVE_TYPES.includes(r.type))
+    if (k === 'litter') return records.filter(r => LITTER_TYPES.includes(r.type))
+    return records.filter(r => r.type === k)
+  })()
 
   return (
-    <div className="hl-page">
-      <style>{S}</style>
-
-      <div className="hl-top">
-        <div className="hl-title">健康紀錄</div>
-        <button className="hl-add" onClick={() => navigate('/health/new')}>
-          <Plus size={14} /> 新增
+    <div style={{ padding: '8px 16px 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 6px 14px' }}>
+        <div>
+          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, letterSpacing: '0.15em', color: '#B5A3A3' }}>SECTION · 健</div>
+          <div style={{ fontFamily: 'Quicksand', fontSize: 26, color: '#3A2E2E', letterSpacing: '-0.01em', marginTop: 2 }}>
+            <span style={{ }}>健康</span> 紀錄
+          </div>
+        </div>
+        <button onClick={() => navigate('/health/new')} style={{
+          background: '#3A2E2E', color: '#FBF6F1', border: 'none',
+          padding: '8px 14px', borderRadius: 999, fontFamily: 'Nunito', fontWeight: 600, fontSize: 12,
+          display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer',
+        }}>
+          <Plus size={13} /> 新增
         </button>
       </div>
 
-      <div className="hl-tabs">
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: 4, background: '#FFFFFF', borderRadius: 18, padding: 4, boxShadow: '0 2px 8px rgba(58,46,46,0.04)' }}>
         {TABS.map((t, i) => (
-          <button key={t} className={`hl-tab${tab === i ? ' active' : ''}`} onClick={() => setTab(i)}>
-            {TABS_EMOJI[i]} {t}
+          <button key={t.k} onClick={() => setTab(i)} style={{
+            flex: 1, border: 'none', padding: '8px 4px', borderRadius: 14,
+            background: tab === i ? '#3A2E2E' : 'transparent',
+            color: tab === i ? '#FBF6F1' : '#6E5A5A',
+            fontFamily: 'Nunito', fontWeight: 600, fontSize: 12, cursor: 'pointer',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+            transition: 'all 0.18s',
+          }}>
+            <span>{t.label}</span>
+            <span style={{ fontFamily: 'JetBrains Mono', fontSize: 8, letterSpacing: '0.1em', opacity: 0.55 }}>{t.sub}</span>
           </button>
         ))}
       </div>
 
-      {loading ? (
-        <div>{[1, 2, 3].map(i => <div key={i} className="skel" />)}</div>
-      ) : filtered.length === 0 ? (
-        <div className="hl-empty">
-          <div className="hl-empty-icon">{TABS_EMOJI[tab]}</div>
-          <div className="hl-empty-text">還沒有{TABS[tab]}紀錄</div>
-          <button className="hl-add" onClick={() => navigate('/health/new')} style={{ margin: '0 auto' }}>
-            新增紀錄
-          </button>
-        </div>
-      ) : (
-        <div className="fade-in">
-          {filtered.map(r => {
-            const dotColor = r.type === 'weight' ? '#4AAFDC'
-              : r.type === 'visit' ? '#F87171'
-              : r.type === 'anomaly' ? (r.severity === 'severe' ? '#EF4444' : r.severity === 'moderate' ? '#F97316' : '#F59E0B')
-              : LITTER_TYPES.includes(r.type) ? (LITTER_BADGE[r.type]?.color || '#9BBDD0')
-              : (PREVENTIVE_BADGE[r.type]?.color || '#9BBDD0')
-            return (
-              <div key={r.id} className="hl-card">
-                <div className="hl-dot" style={{ background: dotColor }} />
-                <div className="hl-body">
-                  {r.type === 'anomaly' && (
-                    <>
-                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-                        <span className="hl-anomaly-symptom">{r.symptom}</span>
-                        {r.severity && SEVERITY_BADGE[r.severity] && (
-                          <span
-                            className="hl-badge"
-                            style={{ background: SEVERITY_BADGE[r.severity].color + '22', color: SEVERITY_BADGE[r.severity].color }}
-                          >
-                            {SEVERITY_BADGE[r.severity].label}
-                          </span>
-                        )}
-                      </div>
-                      {r.photos?.length > 0 && (
-                        <div className="hl-anomaly-photos">
-                          {r.photos.map((p, i) => (
-                            <a key={i} href={p.url} target="_blank" rel="noreferrer">
-                              <img src={p.url} alt="" className="hl-anomaly-photo" />
-                            </a>
-                          ))}
-                        </div>
+      <div style={{ marginTop: 14 }}>
+        {loading ? (
+          [1,2,3].map(i => <div key={i} style={{ height: 70, background: '#FFFFFF', borderRadius: 22, marginBottom: 8, opacity: 0.6 }} />)
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '64px 16px' }}>
+            <div style={{ fontFamily: 'Quicksand', fontSize: 18, color: '#6E5A5A', marginBottom: 12 }}>還沒有紀錄</div>
+            <button onClick={() => navigate('/health/new')} style={{
+              background: '#3A2E2E', color: '#FBF6F1', border: 'none', padding: '10px 18px', borderRadius: 999,
+              fontFamily: 'Nunito', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            }}>＋ 新增第一筆</button>
+          </div>
+        ) : (
+          filtered.map(r => (
+            <div key={r.id} style={{
+              background: '#FFFFFF', borderRadius: 20, padding: '14px 16px', marginBottom: 8,
+              display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'flex-start',
+              boxShadow: '0 2px 8px rgba(58,46,46,0.04)',
+            }}>
+              <div style={{ minWidth: 0 }}>
+                {r.type === 'weight' && (
+                  <>
+                    <div style={{ fontFamily: 'Quicksand', fontSize: 32, lineHeight: 1, color: '#3A2E2E', fontWeight: 400 }}>
+                      {r.weight}<span style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: '#B5A3A3', marginLeft: 4 }}>kg</span>
+                    </div>
+                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#B5A3A3', marginTop: 6, letterSpacing: '0.1em' }}>{r.date}{r.note ? ` · ${r.note}` : ''}</div>
+                  </>
+                )}
+                {PREVENTIVE_TYPES.includes(r.type) && (
+                  <>
+                    <div style={{ fontFamily: 'Quicksand', fontSize: 17, fontWeight: 500, color: '#3A2E2E' }}>{r.name}</div>
+                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 9.5, color: 'oklch(0.78 0.06 25)', letterSpacing: '0.12em', marginTop: 3 }}>{PREVENTIVE_LABEL[r.type]?.toUpperCase()}</div>
+                    {r.nextDate && <div style={{ fontFamily: 'Nunito', fontSize: 12, color: 'oklch(0.78 0.06 25)', marginTop: 4 }}>下次 · {r.nextDate}</div>}
+                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#B5A3A3', marginTop: 4 }}>{r.date}{r.note ? ` · ${r.note}` : ''}</div>
+                  </>
+                )}
+                {LITTER_TYPES.includes(r.type) && (
+                  <>
+                    <div style={{ fontFamily: 'Quicksand', fontSize: 17, fontWeight: 500, color: '#3A2E2E' }}>更換{LITTER_LABEL[r.type]}</div>
+                    {r.nextDate && <div style={{ fontFamily: 'Nunito', fontSize: 12, color: '#6E5A5A', marginTop: 4 }}>下次 · {r.nextDate}</div>}
+                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#B5A3A3', marginTop: 4 }}>{r.date}{r.note ? ` · ${r.note}` : ''}</div>
+                  </>
+                )}
+                {r.type === 'visit' && (
+                  <>
+                    <div style={{ fontFamily: 'Quicksand', fontSize: 17, fontWeight: 500, color: '#3A2E2E' }}>{r.clinic}</div>
+                    {r.reason && <div style={{ fontFamily: 'Nunito', fontSize: 12, color: '#6E5A5A', marginTop: 2 }}>{r.reason}</div>}
+                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#B5A3A3', marginTop: 4 }}>{r.date}{r.note ? ` · ${r.note}` : ''}</div>
+                  </>
+                )}
+                {r.type === 'anomaly' && (
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <span style={{ fontFamily: 'Quicksand', fontSize: 16, fontWeight: 500, color: '#3A2E2E' }}>{r.symptom}</span>
+                      {r.severity && (
+                        <span style={{
+                          fontFamily: 'JetBrains Mono', fontSize: 9, letterSpacing: '0.1em',
+                          padding: '2px 7px', borderRadius: 999,
+                          background: 'oklch(0.78 0.06 25 / 0.15)', color: 'oklch(0.78 0.06 25)',
+                        }}>{SEVERITY_LABEL[r.severity]?.toUpperCase()}</span>
                       )}
-                      <div className="hl-date">{r.date}{r.note ? ` · ${r.note}` : ''}</div>
-                    </>
-                  )}
-                  {r.type === 'weight' && (
-                    <>
-                      <div className="hl-weight">{r.weight}<span className="hl-weight-unit">kg</span></div>
-                      {r.note && <div className="hl-date">{r.date} · {r.note}</div>}
-                      {!r.note && <div className="hl-date">{r.date}</div>}
-                    </>
-                  )}
-                  {PREVENTIVE_TYPES.includes(r.type) && (
-                    <>
-                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <span className="hl-name">{r.name}</span>
-                        <span
-                          className="hl-badge"
-                          style={{ background: (PREVENTIVE_BADGE[r.type]?.color || '#9BBDD0') + '22', color: PREVENTIVE_BADGE[r.type]?.color }}
-                        >
-                          {PREVENTIVE_BADGE[r.type]?.label}
-                        </span>
+                    </div>
+                    {r.photos?.length > 0 && (
+                      <div style={{ display: 'flex', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
+                        {r.photos.map((p, i) => (
+                          <a key={i} href={p.url} target="_blank" rel="noreferrer">
+                            <img src={p.url} alt="" style={{ width: 52, height: 52, borderRadius: 10, objectFit: 'cover' }} />
+                          </a>
+                        ))}
                       </div>
-                      {r.nextDate && (
-                        <div className="hl-next" style={{ color: PREVENTIVE_BADGE[r.type]?.color }}>
-                          下次：{r.nextDate}
-                        </div>
-                      )}
-                      <div className="hl-date">{r.date}{r.note ? ` · ${r.note}` : ''}</div>
-                    </>
-                  )}
-                  {LITTER_TYPES.includes(r.type) && (
-                    <>
-                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <span className="hl-name">更換{LITTER_BADGE[r.type]?.label}</span>
-                        <span
-                          className="hl-badge"
-                          style={{ background: (LITTER_BADGE[r.type]?.color || '#9BBDD0') + '22', color: LITTER_BADGE[r.type]?.color }}
-                        >
-                          {LITTER_BADGE[r.type]?.label}
-                        </span>
-                      </div>
-                      {r.nextDate && (
-                        <div className="hl-next" style={{ color: LITTER_BADGE[r.type]?.color }}>
-                          下次：{r.nextDate}
-                        </div>
-                      )}
-                      <div className="hl-date">{r.date}{r.note ? ` · ${r.note}` : ''}</div>
-                    </>
-                  )}
-                  {r.type === 'visit' && (
-                    <>
-                      <div className="hl-visit-clinic">{r.clinic}</div>
-                      {r.reason && <div className="hl-visit-reason">{r.reason}</div>}
-                      <div className="hl-date">{r.date}{r.note ? ` · ${r.note}` : ''}</div>
-                    </>
-                  )}
-                </div>
-                <button className="hl-del" onClick={() => handleDelete(r.id)}>
-                  <Trash2 size={15} />
-                </button>
+                    )}
+                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#B5A3A3', marginTop: 6 }}>{r.date}{r.note ? ` · ${r.note}` : ''}</div>
+                  </>
+                )}
               </div>
-            )
-          })}
-        </div>
-      )}
+              <button onClick={() => handleDelete(r.id)} style={{ background: 'none', border: 'none', color: '#D8C8C8', cursor: 'pointer', padding: 4 }}>
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   )
 }

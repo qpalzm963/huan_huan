@@ -1,8 +1,14 @@
-export default function Card({ children, className = '', onClick }) {
+export default function Card({ children, className = '', onClick, style }) {
   return (
     <div
       onClick={onClick}
-      className={`bg-white rounded-2xl border border-[#B0D8EE] shadow-sm ${onClick ? 'cursor-pointer active:scale-[0.98] transition-transform' : ''} ${className}`}
+      className={`${onClick ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''} ${className}`}
+      style={{
+        background: '#FFFFFF',
+        borderRadius: 22,
+        boxShadow: '0 6px 20px rgba(58,46,46,0.06), 0 1px 3px rgba(58,46,46,0.04)',
+        ...style,
+      }}
     >
       {children}
     </div>

@@ -1,28 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  --color-sky-primary: #4AAFDC;
-  --color-sky-light: #B0D8EE;
-  --color-sky-bg: #F2F9FC;
-  --color-sky-surface: #FFFFFF;
-  --color-sky-dark: #1A4F6E;
-  --color-sky-mid: #3A7EA0;
-  --color-sky-muted: #7BAEC8;
-  --color-sky-border: #B0D8EE;
+  --color-bg: #FBF6F1;
+  --color-card: #FFFFFF;
+  --color-ink: #3A2E2E;
+  --color-ink-soft: #6E5A5A;
+  --color-ink-mute: #B5A3A3;
+  --color-accent: oklch(0.88 0.05 15);
+  --color-accent-2: oklch(0.78 0.06 25);
+  --color-rule: #F0E4E0;
+  --color-glow: oklch(0.94 0.04 20);
 
-  --font-caveat: 'Caveat', cursive;
-  --font-quicksand: 'Quicksand', sans-serif;
+  --font-display: 'Quicksand', 'Nunito', system-ui, sans-serif;
+  --font-sans: 'Nunito', 'Quicksand', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: 'Quicksand', sans-serif;
-  background-color: #F2F9FC;
-  color: #1A4F6E;
+  font-family: 'Nunito', system-ui, sans-serif;
+  background-color: #FBF6F1;
+  color: #3A2E2E;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -31,3 +31,6 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+.font-display { font-family: 'Quicksand', 'Nunito', system-ui, sans-serif; font-weight: 600; }
+.font-mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; }
