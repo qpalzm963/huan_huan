@@ -33,7 +33,10 @@ function BrandAvatar({ brand, idx = 0, size = 44 }) {
   )
 }
 
-export { BrandAvatar, LOCAL_ICONS }
+const STAR_FILL = '#F5C04D'
+const STAR_EMPTY = '#FFFFFF'
+
+export { BrandAvatar, LOCAL_ICONS, STAR_FILL, STAR_EMPTY }
 
 const addBtnStyle = {
   background: '#3D2A2A', color: '#FFFFFF', border: '2px solid #3D2A2A',
