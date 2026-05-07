@@ -17,7 +17,7 @@ const QUICK_ACTIONS = [
   { label: '記帳', sub: 'SPEND',  to: '/expenses/new', bg: '#FFE4A0', icon: 'spend' },
   { label: '飲食', sub: 'DIET',   to: '/diet/new',     bg: '#FFD4B0', icon: 'diet'  },
   { label: '健康', sub: 'CARE',   to: '/health/new',   bg: '#C8EBD9', icon: 'health'},
-  { label: '照片', sub: 'PHOTO',  to: '/photos/new',   bg: '#C8E0F2', icon: 'photo' },
+  { label: '照片', sub: 'PHOTO',  to: '/photos',       bg: '#C8E0F2', icon: 'photo' },
 ]
 
 // Sticker icons (chunky, color-block, white inner)
